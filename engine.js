@@ -22,8 +22,8 @@ var createScene = function() {
             case 0:
                 goToCarSelect = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 
-                var playBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play!");
-                playBtn.width = "40%"
+                var playBtn = BABYLON.GUI.Button.CreateSimpleButton("playBtn", "Play!");
+                playBtn.width = "40%";
                 playBtn.height = "10%";
                 playBtn.color = "white";
                 playBtn.alpha = .6;
@@ -35,8 +35,8 @@ var createScene = function() {
                     clicks++;
                 });
 
-                var scoresBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Leaderboard");
-                scoresBtn.width = "35%"
+                var scoresBtn = BABYLON.GUI.Button.CreateSimpleButton("scoresBtn", "Leaderboard");
+                scoresBtn.width = "35%";
                 scoresBtn.height = "10%";
                 scoresBtn.color = "white";
                 scoresBtn.alpha = .6;
@@ -44,14 +44,17 @@ var createScene = function() {
                 scoresBtn.top = "20%";
                 scoresBtn.background = "green";
 
-                var quitBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Quit");
-                quitBtn.width = "20%"
+                var quitBtn = BABYLON.GUI.Button.CreateSimpleButton("quitBtn", "Quit");
+                quitBtn.width = "20%";
                 quitBtn.height = "10%";
                 quitBtn.color = "white";
                 quitBtn.alpha = .6;
                 quitBtn.cornerRadius = 20;
                 quitBtn.top = "35%";
                 quitBtn.background = "red";
+                quitBtn.onPointerUpObservable.add(function() {
+                    window.close();
+                });
 
                 goToCarSelect.addControl(playBtn);
                 goToCarSelect.addControl(scoresBtn);
@@ -137,8 +140,6 @@ var createScene = function() {
 
     return scene;
 };
-
-
 
 
 /*
