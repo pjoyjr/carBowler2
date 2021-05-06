@@ -22,19 +22,40 @@ var createScene = function() {
             case 0:
                 goToCarSelect = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 
-                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play");
-                button1.width = "150px"
-                button1.height = "40px";
-                button1.color = "white";
-                button1.alpha = .6;
-
-                button1.cornerRadius = 20;
-                button1.background = "green";
-                button1.onPointerUpObservable.add(function() {
+                var playBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play!");
+                playBtn.width = "40%"
+                playBtn.height = "10%";
+                playBtn.color = "white";
+                playBtn.alpha = .6;
+                playBtn.cornerRadius = 20;
+                playBtn.background = "green";
+                playBtn.top = "5%";
+                playBtn.fontSizeInPixels = "50px";
+                playBtn.onPointerUpObservable.add(function() {
                     clicks++;
-
                 });
-                goToCarSelect.addControl(button1);
+
+                var scoresBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Leaderboard");
+                scoresBtn.width = "35%"
+                scoresBtn.height = "10%";
+                scoresBtn.color = "white";
+                scoresBtn.alpha = .6;
+                scoresBtn.cornerRadius = 20;
+                scoresBtn.top = "20%";
+                scoresBtn.background = "green";
+
+                var quitBtn = BABYLON.GUI.Button.CreateSimpleButton("but1", "Quit");
+                quitBtn.width = "20%"
+                quitBtn.height = "10%";
+                quitBtn.color = "white";
+                quitBtn.alpha = .6;
+                quitBtn.cornerRadius = 20;
+                quitBtn.top = "35%";
+                quitBtn.background = "red";
+
+                goToCarSelect.addControl(playBtn);
+                goToCarSelect.addControl(scoresBtn);
+                goToCarSelect.addControl(quitBtn);
 
                 break
             case 1:
