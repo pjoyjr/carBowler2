@@ -52,21 +52,12 @@ var createScene = function() {
     // This creates a basic Babylon Scene object (non-mesh)
     var scene = new BABYLON.Scene(engine);
 
-    // This creates and positions a free camera (non-mesh)
+    //Setup Camera and lighting
     var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
-
-    // This targets the camera to scene origin
     camera.setTarget(BABYLON.Vector3.Zero());
-
-    // This attaches the camera to the canvas
     camera.attachControl(canvas, true);
 
-
-
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
     light.intensity = 0.7;
 
     // Our built-in 'sphere' shape.
@@ -78,18 +69,13 @@ var createScene = function() {
 
     // second scene
     scene1 = new BABYLON.Scene(engine);
+
+    //Setup Camera and lighting
     var camera1 = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene1);
-
-    // This targets the camera to scene origin
     camera1.setTarget(BABYLON.Vector3.Zero());
-
-    // This attaches the camera to the canvas
     camera1.attachControl(canvas, true);
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light1 = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene1);
-
-    // Default intensity is 1. Let's dim the light a small amount
     light1.intensity = 0.7;
 
     var cube = BABYLON.MeshBuilder.CreateBox('box', { size: 2 }, scene1)
@@ -123,6 +109,13 @@ var createScene = function() {
 
     return scene;
 };
+
+
+
+
+/*
+CODE NEEDED TO RUN BABYLON.JS ENGINE AND SCENES
+*/
 var engine;
 var scene;
 initFunction = async function() {
