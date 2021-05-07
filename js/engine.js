@@ -33,7 +33,7 @@ var createScene = function() {
                 scoresBtn.top = "20%";
                 quitBtn.top = "35%";
 
-                // bg = new BABYLON.Layer('', 'https://github.com/pjoyjr/carBowler2/blob/main/img/landscape.jpeg?raw=true', scene, true);
+                var layer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', scene, true);
 
                 playBtn.onPointerUpObservable.add(function() {
                     clicks++;
@@ -75,7 +75,6 @@ var createScene = function() {
     scene1.createDefaultCameraOrLight(true, true, true);
 
     // Built in Meshes
-    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 8 }, scene);
     var cube = BABYLON.MeshBuilder.CreateBox('box', { size: .1 }, scene1)
 
     createGUI(scene, showScene);
