@@ -33,6 +33,8 @@ var createScene = function() {
                 scoresBtn.top = "20%";
                 quitBtn.top = "35%";
 
+                // bg = new BABYLON.Layer('', 'https://github.com/pjoyjr/carBowler2/blob/main/img/landscape.jpeg?raw=true', scene, true);
+
                 playBtn.onPointerUpObservable.add(function() {
                     clicks++;
                 });
@@ -69,22 +71,12 @@ var createScene = function() {
     var scene1 = new BABYLON.Scene(engine);
 
     //Setup Camera and lighting
-    var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
-    camera.setTarget(BABYLON.Vector3.Zero());
-    camera.attachControl(canvas, true);
-    var camera1 = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene1);
-    camera1.setTarget(BABYLON.Vector3.Zero());
-    camera1.attachControl(canvas, true);
-
-    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-    light.intensity = 0.7;
-    var light1 = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene1);
-    light1.intensity = 0.7;
+    scene.createDefaultCameraOrLight(true, true, true);
+    scene1.createDefaultCameraOrLight(true, true, true);
 
     // Built in Meshes
-    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
-    sphere.position.y = 1; // Move the sphere upward 1/2 its height
-    var cube = BABYLON.MeshBuilder.CreateBox('box', { size: 2 }, scene1)
+    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1, segments: 8 }, scene);
+    var cube = BABYLON.MeshBuilder.CreateBox('box', { size: .1 }, scene1)
 
     createGUI(scene, showScene);
 
