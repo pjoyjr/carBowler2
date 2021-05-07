@@ -1,15 +1,6 @@
-var canvas = document.getElementById("renderCanvas");
+const canvas = document.getElementById("renderCanvas");
+var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
-var engine = null;
-var scene = null;
-var sceneToRender = null;
-var createDefaultEngine = function() {
-    return new BABYLON.Engine(canvas, true, {
-        preserveDrawingBuffer: true,
-        stencil: true,
-        disableWebGL2Support: false
-    })
-};
 var createScene = function() {
 
     var clicks = 0;
@@ -42,7 +33,7 @@ var createScene = function() {
                 scoresBtn.alpha = .6;
                 scoresBtn.cornerRadius = 20;
                 scoresBtn.top = "20%";
-                scoresBtn.background = "green";
+                scoresBtn.background = "blue";
 
                 var quitBtn = BABYLON.GUI.Button.CreateSimpleButton("quitBtn", "Quit");
                 quitBtn.width = "20%";
@@ -142,32 +133,11 @@ var createScene = function() {
 };
 
 
-/*
-CODE NEEDED TO RUN BABYLON.JS ENGINE AND SCENES
-*/
-var engine;
-var scene;
-initFunction = async function() {
-    var asyncEngineCreation = async function() {
-        try {
-            return createDefaultEngine();
-        } catch (e) {
-            console.log("the available createEngine function failed. Creating the default engine instead");
-            return createDefaultEngine();
-        }
-    }
+var scene = createScene();
 
-    engine = await asyncEngineCreation();
-    if (!engine) throw 'engine should not be null.';
+engine.runRenderLoop(function() {
     scene = createScene();
-};
-initFunction().then(() => {
-    sceneToRender = scene
-    engine.runRenderLoop(function() {
-        if (sceneToRender && sceneToRender.activeCamera) {
-            sceneToRender.render();
-        }
-    });
+    scene.render();
 });
 
 // Resize
