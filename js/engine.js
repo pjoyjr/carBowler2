@@ -33,12 +33,28 @@ var getScene = function() {
 
             case 1: //CAR SELECT MENU
                 carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, carSelectScene);
+                var nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", ">");
+                var prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<");
+                formatBtn(nextBtn);
+                nextBtn.width = "5%";
+                nextBtn.top = "-15%";
+                nextBtn.left = "40%";
+                formatBtn(prevBtn);
+                prevBtn.width = "5%";
+                prevBtn.top = "-15%";
+                prevBtn.left = "-40%";
+                carSelectGUI.addControl(nextBtn);
+                carSelectGUI.addControl(prevBtn);
+                //ADD ROTATING MODELS OF CARS (SQUARE, SPHERE and PYRAMID FOR NOW)
+
+
+
                 var selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
                 var backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "Go To Menu");
                 formatBtn(selectBtn);
                 formatBtn(backBtn);
-                selectBtn.top = "20%";
-                backBtn.top = "35%";
+                selectBtn.top = "30%";
+                backBtn.top = "42%";
                 selectBtn.onPointerUpObservable.add(function() {
                     state = 2;
                 });
