@@ -42,22 +42,16 @@ var createScene = function() {
                 carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, carSelectScene);
                 nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", ">");
                 prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<");
+                selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
+                backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "Go To Menu");
                 formatBtn(nextBtn);
+                formatBtn(prevBtn);
                 nextBtn.width = "5%";
                 nextBtn.top = "-15%";
                 nextBtn.left = "40%";
-                formatBtn(prevBtn);
                 prevBtn.width = "5%";
                 prevBtn.top = "-15%";
                 prevBtn.left = "-40%";
-                carSelectGUI.addControl(nextBtn);
-                carSelectGUI.addControl(prevBtn);
-                //ADD ROTATING MODELS OF CARS (SQUARE, SPHERE and PYRAMID FOR NOW)
-
-
-
-                selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
-                backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "Go To Menu");
                 formatBtn(selectBtn);
                 formatBtn(backBtn);
                 selectBtn.top = "30%";
@@ -68,8 +62,11 @@ var createScene = function() {
                 backBtn.onPointerUpObservable.add(function() {
                     state = 0;
                 });
+                carSelectGUI.addControl(nextBtn);
+                carSelectGUI.addControl(prevBtn);
                 carSelectGUI.addControl(selectBtn);
                 carSelectGUI.addControl(backBtn);
+                //ADD ROTATING MODELS OF CARS (SQUARE, SPHERE and PYRAMID FOR NOW)
                 break
             case 2: //PLAY GAME
                 break
