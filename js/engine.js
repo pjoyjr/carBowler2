@@ -1,17 +1,26 @@
 const canvas = document.getElementById("renderCanvas");
-var mainMenuScene, carSelectScene, gameScene;
+var mainMenuScene, carSelectScene;
 
 //SCENE MANAGEMENT and GUI VARIABLES
-var state, currScene;
+var state, currScene, scene;
 var mainGUI, carSelectGUI;
 var bgLayer;
 var playBtn, nextBtn, prevBtn, selectBtn, backBtn;
 
 
 var createScene = function() {
+    //Initialize Scenes
+    mainMenuScene = new BABYLON.Scene(engine);
+    carSelectScene = new BABYLON.Scene(engine);
+
+    //Setup Camera and lighting
+    mainMenuScene.createDefaultCameraOrLight(true, true, true);
+    carSelectScene.createDefaultCameraOrLight(true, true, true);
+
+    //Scene management variables
     state = 0;
     currScene = 0;
-    mainGUI, carSelectGUI;
+    scene = mainMenuScene;
 
     var formatBtn = function(button) {
         button.width = "35%";
@@ -56,9 +65,11 @@ var createScene = function() {
                 formatBtn(backBtn);
                 selectBtn.top = "30%";
                 backBtn.top = "42%";
+                /*
                 selectBtn.onPointerUpObservable.add(function() {
                     state = 2;
                 });
+                */
                 backBtn.onPointerUpObservable.add(function() {
                     state = 0;
                 });
@@ -73,16 +84,6 @@ var createScene = function() {
         }
 
     }
-
-    //Initialize Scenes
-    mainMenuScene = new BABYLON.Scene(engine);
-    carSelectScene = new BABYLON.Scene(engine);
-    gameScene = new BABYLON.Scene(engine);
-
-    //Setup Camera and lighting
-    mainMenuScene.createDefaultCameraOrLight(true, true, true);
-    carSelectScene.createDefaultCameraOrLight(true, true, true);
-    gameScene.createDefaultCameraOrLight(true, true, true);
 
     createGUI(currScene);
 
@@ -103,17 +104,12 @@ var createScene = function() {
                         createGUI(currScene);
                         carSelectScene.render();
                         break
-                    case 2:
-                        carSelectGUI.dispose();
-                        createGUI(currScene);
-                        gameScene.render();
-                        break
                 }
             }
         });
     }, 500);
 
-    return mainMenuScene;
+    return scene;
 };
 
 
