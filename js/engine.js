@@ -1,26 +1,22 @@
 const canvas = document.getElementById("renderCanvas");
-var mainMenuScene, carSelectScene;
 
-//SCENE MANAGEMENT and GUI VARIABLES
-var state, currScene, scene;
-var mainGUI, carSelectGUI;
-var bgLayer;
-var playBtn, nextBtn, prevBtn, selectBtn, backBtn;
+var engine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+    disableWebGL2Support: false
+});
 
 
 var createScene = function() {
-    //Initialize Scenes
-    mainMenuScene = new BABYLON.Scene(engine);
-    carSelectScene = new BABYLON.Scene(engine);
+    var startScene = null;
+    var carSelectScene = null;
+    var state = 0;
+    var currScene = 0;
+    var mainMenuGUI, carSelectGUI;
 
-    //Setup Camera and lighting
-    mainMenuScene.createDefaultCameraOrLight(true, true, true);
-    carSelectScene.createDefaultCameraOrLight(true, true, true);
-
-    //Scene management variables
-    state = 0;
-    currScene = 0;
-    scene = mainMenuScene;
+    var bgLayer;
+    var playBtn, nextBtn, prevBtn, selectBtn, backBtn;
+    var mainMenuCam, mainMenuLight, carSelectCam, carSelectLight;
 
     var formatBtn = function(button) {
         button.width = "35%";
@@ -33,22 +29,22 @@ var createScene = function() {
         button.children[0].color = "white";
     };
 
-    var createGUI = function(currScene) {
+    var createGUI = function(scene, currScene) {
         switch (currScene) {
-            case 0: //MAIN MENU
-                mainGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, mainMenuScene);
-                bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', mainMenuScene, true);
+            case 0:
+                mainMenuGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+                bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', startScene, true);
                 playBtn = BABYLON.GUI.Button.CreateSimpleButton("playBtn", "Play!");
                 formatBtn(playBtn);
                 playBtn.top = "42%";
                 playBtn.onPointerUpObservable.add(function() {
                     state = 1;
                 });
-                mainGUI.addControl(playBtn);
+                mainMenuGUI.addControl(playBtn);
                 break
 
-            case 1: //CAR SELECT MENU
-                carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, carSelectScene);
+            case 1:
+                carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
                 nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", ">");
                 prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<");
                 selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
@@ -77,16 +73,38 @@ var createScene = function() {
                 carSelectGUI.addControl(prevBtn);
                 carSelectGUI.addControl(selectBtn);
                 carSelectGUI.addControl(backBtn);
-                //ADD ROTATING MODELS OF CARS (SQUARE, SPHERE and PYRAMID FOR NOW)
                 break
-            case 2: //PLAY GAME
-                break
+
         }
 
-    }
+    };
 
-    createGUI(currScene);
 
+    // first scene
+    startScene = new BABYLON.Scene(engine);
+    mainMenuCam = new BABYLON.FreeCamera("mainMenuCam", new BABYLON.Vector3(0, 5, -10), startScene);
+    mainMenuCam.lockedTarget = new BABYLON.Vector3.Zero();
+    mainMenuCam.attachControl(canvas, true);
+    mainMenuLight = new BABYLON.HemisphericLight("mainMenuLight", new BABYLON.Vector3(0, 1, 0), startScene);
+    mainMenuLight.intensity = 0.7;
+
+    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, startScene);
+    sphere.position.y = 1; // Move the sphere upward 1/2 its height
+
+
+    // second scene
+    carSelectScene = new BABYLON.Scene(engine);
+    carSelectCam = new BABYLON.FreeCamera("carSelectCam", new BABYLON.Vector3(0, 5, -10), carSelectScene);
+    carSelectCam.lockedTarget = new BABYLON.Vector3.Zero();
+    carSelectCam.attachControl(canvas, true);
+    carSelectLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), carSelectScene);
+    carSelectLight.intensity = 0.7;
+    var cube = BABYLON.MeshBuilder.CreateBox('box', { size: 2 }, carSelectScene)
+
+    createGUI(startScene, currScene);
+
+    //runRenderLoop inside a setTimeout is neccesary in the Playground
+    //to stop the PG's runRenderLoop.
     setTimeout(function() {
         engine.stopRenderLoop();
 
@@ -96,12 +114,12 @@ var createScene = function() {
                 switch (currScene) {
                     case 0:
                         carSelectGUI.dispose();
-                        createGUI(currScene);
-                        mainMenuScene.render();
+                        createGUI(startScene, currScene);
+                        startScene.render();
                         break
                     case 1:
-                        mainGUI.dispose();
-                        createGUI(currScene);
+                        mainMenuGUI.dispose();
+                        createGUI(carSelectScene, currScene);
                         carSelectScene.render();
                         break
                 }
@@ -109,20 +127,14 @@ var createScene = function() {
         });
     }, 500);
 
-    return scene;
+    return startScene;
 };
 
 
-
-/*
- * Code to run all game logic
- */
-var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
 var scene = createScene();
 
 engine.runRenderLoop(function() {
-    if (scene)
-        scene.render();
+    scene.render();
 });
 
 // Resize
