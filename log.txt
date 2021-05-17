@@ -1,0 +1,3 @@
+BUGS:
+Objects dont render on first load to carSelectScene.
+
