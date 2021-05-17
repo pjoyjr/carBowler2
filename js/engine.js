@@ -6,13 +6,13 @@ var engine = new BABYLON.Engine(canvas, true, {
     disableWebGL2Support: false
 });
 
-var state = 0;
-var currScene = 0;
 
 var createScene = function() {
     var startScene = null;
     var carSelectScene = null;
     var mainMenuGUI, carSelectGUI;
+    var currScene = 0;
+    var state = 0;
 
     var bgLayer;
     var playBtn, nextBtn, prevBtn, selectBtn, backBtn;
@@ -29,16 +29,16 @@ var createScene = function() {
         button.children[0].color = "white";
     };
 
-    var createGUI = function(scene, currScene) {
-        switch (currScene) {
+    var createGUI = function(scene, state) {
+        switch (state) {
             case 0:
                 mainMenuGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
-                bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', startScene, true);
+                bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', scene, true);
                 playBtn = BABYLON.GUI.Button.CreateSimpleButton("playBtn", "Play!");
                 formatBtn(playBtn);
                 playBtn.top = "42%";
                 playBtn.onPointerUpObservable.add(function() {
-                    state = 1;
+                    currScene = 1;
                 });
                 mainMenuGUI.addControl(playBtn);
                 break
@@ -63,11 +63,11 @@ var createScene = function() {
                 backBtn.top = "42%";
                 /*
                 selectBtn.onPointerUpObservable.add(function() {
-                    state = 2;
+                    currScene = 2;
                 });
                 */
                 backBtn.onPointerUpObservable.add(function() {
-                    state = 0;
+                    currScene = 0;
                 });
                 carSelectGUI.addControl(nextBtn);
                 carSelectGUI.addControl(prevBtn);
@@ -103,7 +103,7 @@ var createScene = function() {
     sphere.position.x = 3; // Move the sphere upward 1/2 its width
 
 
-    createGUI(startScene, currScene);
+    createGUI(startScene, state);
 
     //runRenderLoop inside a setTimeout is neccesary in the Playground
     //to stop the PG's runRenderLoop.
@@ -111,17 +111,17 @@ var createScene = function() {
         engine.stopRenderLoop();
 
         engine.runRenderLoop(function() {
-            if (currScene != state) {
-                currScene = state;
+            if (state != currScene) {
+                state = currScene;
                 switch (currScene) {
                     case 0:
                         carSelectGUI.dispose();
-                        createGUI(startScene, currScene);
+                        createGUI(startScene, state);
                         startScene.render();
                         break
                     case 1:
                         mainMenuGUI.dispose();
-                        createGUI(carSelectScene, currScene);
+                        createGUI(carSelectScene, state);
                         carSelectScene.render();
                         break
                 }
