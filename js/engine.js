@@ -6,12 +6,12 @@ var engine = new BABYLON.Engine(canvas, true, {
     disableWebGL2Support: false
 });
 
+var state = 0;
+var currScene = 0;
 
 var createScene = function() {
     var startScene = null;
     var carSelectScene = null;
-    var state = 0;
-    var currScene = 0;
     var mainMenuGUI, carSelectGUI;
 
     var bgLayer;
@@ -88,9 +88,6 @@ var createScene = function() {
     mainMenuLight = new BABYLON.HemisphericLight("mainMenuLight", new BABYLON.Vector3(0, 1, 0), startScene);
     mainMenuLight.intensity = 0.7;
 
-    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, startScene);
-    sphere.position.y = 1; // Move the sphere upward 1/2 its height
-
 
     // second scene
     carSelectScene = new BABYLON.Scene(engine);
@@ -99,7 +96,12 @@ var createScene = function() {
     carSelectCam.attachControl(canvas, true);
     carSelectLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), carSelectScene);
     carSelectLight.intensity = 0.7;
-    var cube = BABYLON.MeshBuilder.CreateBox('box', { size: 2 }, carSelectScene)
+
+    var cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 2 }, carSelectScene);
+    cube.position.y = 3; // Move the sphere upward 1/2 its width
+    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2 }, carSelectScene);
+    sphere.position.x = 3; // Move the sphere upward 1/2 its width
+
 
     createGUI(startScene, currScene);
 
