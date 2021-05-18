@@ -2,10 +2,18 @@ BUGS:
 Objects dont render on first load to carSelectScene.  FIXED
 
 TODO:
-rotate meshes in place in carSelectScene
-rotate meshes when < or > are clicked in carSelectScene
+rotate meshes in place in carSelectScene DONE
+rotate meshes when < or > are clicked in carSelectScene DONE
 
 create scene with actual game
 create gui for game (score, frame)
 import rest of game code from pjoyjr.github.io/carBowling
+
+NOTES:
+
+for Vector3(x,z,y)
+x-axis refers to perpendicular to lane
+z-axis refers to normal to lane
+y-axis refers to parallel to lane
+
 
