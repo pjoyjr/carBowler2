@@ -159,7 +159,7 @@ var createCarSelectScene = function() {
 var createGameScene = function() {
     gameScene = new BABYLON.Scene(engine);
 
-    return gameScene
+    return gameScene;
 };
 
 var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false });
