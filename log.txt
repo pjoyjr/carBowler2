@@ -1,3 +1,11 @@
 BUGS:
 Objects dont render on first load to carSelectScene.  FIXED
 
+TODO:
+rotate meshes in place in carSelectScene
+rotate meshes when < or > are clicked in carSelectScene
+
+create scene with actual game
+create gui for game (score, frame)
+import rest of game code from pjoyjr.github.io/carBowling
+
