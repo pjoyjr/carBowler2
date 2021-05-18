@@ -9,7 +9,7 @@ const canvas = document.getElementById("renderCanvas");
 
 var currScene = 0;
 var state = 0;
-var mainMenuScene, carSelectScene;
+var mainMenuScene, carSelectScene, gameScene;
 var bgLayer, playBtn, nextBtn, prevBtn, selectBtn, cam, light;
 var car1Angle = 210,
     car2Angle = 330,
@@ -59,7 +59,7 @@ var formatBtn = function(button) {
     button.children[0].color = "white";
 };
 
-var createMainMenu = function() {
+var createMainMenuScene = function() {
     mainMenuScene = new BABYLON.Scene(engine);
     mainMenuScene.createDefaultCameraOrLight(true, true, true);
 
@@ -77,7 +77,7 @@ var createMainMenu = function() {
     return mainMenuScene;
 };
 
-var createCarSelect = function() {
+var createCarSelectScene = function() {
 
     carSelectScene = new BABYLON.Scene(engine);
     carSelectScene.clearColor = new BABYLON.Color3.Purple();
@@ -108,25 +108,25 @@ var createCarSelect = function() {
     });
 
     carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, carSelectScene);
-    nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", ">");
-    prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<");
+    nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", "Next>");
+    prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<Prev");
     selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
+    backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "< Back");
     formatBtn(nextBtn);
     formatBtn(prevBtn);
-    nextBtn.width = "5%";
+    nextBtn.width = "10%";
     nextBtn.top = "20%";
-    nextBtn.left = "20%";
-    prevBtn.width = "5%";
+    nextBtn.left = "30%";
+    prevBtn.width = "10%";
     prevBtn.top = "20%";
-    prevBtn.left = "-20%";
+    prevBtn.left = "-30%";
     formatBtn(selectBtn);
     selectBtn.top = "42%";
-    /*
-    selectBtn.onPointerUpObservable.add(function() {
-        currScene = 2;
-        
-    });
-    */
+    formatBtn(backBtn);
+    backBtn.top = "-42%";
+    backBtn.left = "-42%";
+    backBtn.width = "15%";
+
     prevBtn.onPointerUpObservable.add(function() {
         rotateCarSelectionPrev();
     });
@@ -135,16 +135,33 @@ var createCarSelect = function() {
         rotateCarSelectionNext();
     });
 
+    backBtn.onPointerUpObservable.add(function() {
+        currScene = 0;
+
+    });
+
+    selectBtn.onPointerUpObservable.add(function() {
+        currScene = 2;
+
+    });
+
     carSelectGUI.addControl(nextBtn);
     carSelectGUI.addControl(prevBtn);
     carSelectGUI.addControl(selectBtn);
+    carSelectGUI.addControl(backBtn);
 
     return carSelectScene;
-}
+};
+
+var createGameScene = function() {
+    gameScene = new BABYLON.Scene(engine);
+
+    return gameScene
+};
 
 var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false });
 
-var activeScene = createMainMenu();
+var activeScene = createMainMenuScene();
 
 engine.runRenderLoop(function() {
     activeScene.render();
@@ -152,10 +169,13 @@ engine.runRenderLoop(function() {
         state = currScene;
         switch (currScene) {
             case 0:
-                activeScene = createMainMenu();
+                activeScene = createMainMenuScene();
                 break
             case 1:
-                activeScene = createCarSelect();
+                activeScene = createCarSelectScene();
+                break
+            case 2:
+                activeScene = createGameScene();
                 break
         }
     }
