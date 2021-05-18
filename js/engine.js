@@ -9,6 +9,7 @@ const canvas = document.getElementById("renderCanvas");
 
 var currScene = 0;
 var state = 0;
+var carSelectNum = 0;
 var mainMenuScene, carSelectScene, gameScene;
 var bgLayer, playBtn, nextBtn, prevBtn, selectBtn, cam, light;
 var car1Angle = 210,
@@ -27,6 +28,7 @@ var rotateCarSelectionPrev = function() {
     car1Angle += 120;
     car2Angle += 120;
     car3Angle += 120;
+    carSelectNum = (carSelectNum - 1) % 3;
 
     cube.position.x = Math.cos(degToRadians(car1Angle)) * radius;
     cube.position.z = Math.sin(degToRadians(car1Angle)) * radius - 1;
@@ -39,6 +41,7 @@ var rotateCarSelectionNext = function() {
     car1Angle -= 120;
     car2Angle -= 120;
     car3Angle -= 120;
+    carSelectNum = (carSelectNum + 1) % 3;
 
     cube.position.x = Math.cos(degToRadians(car1Angle)) * radius;
     cube.position.z = Math.sin(degToRadians(car1Angle)) * radius - 1;
