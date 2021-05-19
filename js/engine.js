@@ -17,7 +17,8 @@ var car1Angle = 210,
     car3Angle = 90,
     radius = 2.5;
 
-var cube, cone, pill;
+var pill, cube, cone;
+var carsArray = [pill, cube, cone];
 
 //game variables
 var overRamp = false; //for checking to see if user can alter car
@@ -220,25 +221,28 @@ var createGameGUI = function() {
 
 //Function to add car to scene
 var addCar = function() {
+    var car, carMesh, carMeshMat;
+    var carMeshAlpha = 1;
+
     overRamp = false;
     //create bounding box for physics engine
-    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, scene);
+    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, gameScene);
     carMesh.position = new BABYLON.Vector3(0, 18, -180);
-    carMeshMat = new BABYLON.StandardMaterial(scene);
+    carMeshMat = new BABYLON.StandardMaterial(gameScene);
     carMeshMat.alpha = carMeshAlpha;
-    carMeshMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
     carMesh.material = carMeshMat;
     //load in car from blender
     /*
-    BABYLON.SceneLoader.ImportMesh("Car", "obj/", "car.babylon", scene,
+    BABYLON.SceneLoader.ImportMesh("car", "obj/", "car.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
             car.scaling = new BABYLON.Vector3(3, 3, 5);
             //car.position = new BABYLON.Vector3(0, 16, -180);
             car.position = carMesh.getAbsolutePosition();
         });
-    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, scene);
     */
+    //carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
 
 };
 
@@ -250,13 +254,11 @@ var addObjects = function() {
     var lane, laneMesh, laneMeshMat;
     var rampMesh, rampMeshMat;
     var island, islandMat;
-    //var car, carMesh, carMeshMat;
     //var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
     //var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10, pinMesh;
     //alphas for testing
-    var carMeshAlpha = 1;
-    var laneMeshAlpha = 0;
-    var rampMeshAlpha = 0;
+    var laneMeshAlpha = 1;
+    var rampMeshAlpha = 1;
     var islandMeshAlpha = 0;
     var islandMatAlpha = 1; //leave at 1
     //var pinMeshAlpha = 0;
@@ -298,9 +300,9 @@ var addObjects = function() {
     //CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
     //lane with ramp obj from blender
     /*
-    BABYLON.SceneLoader.ImportMesh("lane", "./obj/", "lane.babylon", gameScene,
-        function(newMeshes) {
-            lane = newMeshes[0];
+    BABYLON.SceneLoader.ImportMesh("lane", "obj/", "lane.babylon", gameScene,
+        function(meshes) {
+            lane = meshes[0];
             lane.position = new BABYLON.Vector3(0, 3, -100);
             lane.scaling = new BABYLON.Vector3(30, 8, 120);
         });
@@ -376,6 +378,7 @@ var createGameScene = function() {
 
     createGameGUI();
     addObjects();
+    addCar();
 
     return gameScene;
 };
