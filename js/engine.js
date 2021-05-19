@@ -36,7 +36,7 @@ var rotateCarSelectionPrev = function() {
     cone.position.z = Math.sin(degToRadians(car2Angle)) * radius - 1;
     pill.position.x = Math.cos(degToRadians(car3Angle)) * radius;
     pill.position.z = Math.sin(degToRadians(car3Angle)) * radius - 1;
-}
+};
 var rotateCarSelectionNext = function() {
     car1Angle -= 120;
     car2Angle -= 120;
@@ -49,7 +49,7 @@ var rotateCarSelectionNext = function() {
     cone.position.z = Math.sin(degToRadians(car2Angle)) * radius - 1;
     pill.position.x = Math.cos(degToRadians(car3Angle)) * radius;
     pill.position.z = Math.sin(degToRadians(car3Angle)) * radius - 1;
-}
+};
 
 var formatBtn = function(button) {
     button.width = "35%";
@@ -60,6 +60,15 @@ var formatBtn = function(button) {
     button.background = "blue";
     button.fontSize = "50px";
     button.children[0].color = "white";
+};
+
+var formatTextGUI = function(textGUI) {
+    textGUI.width = "35%";
+    textGUI.height = "10%";
+    textGUI.color = "white";
+    textGUI.cornerRadius = 20;
+    textGUI.background = "green";
+    textGUI.fontSize = 24;
 };
 
 var createMainMenuScene = function() {
@@ -111,10 +120,10 @@ var createCarSelectScene = function() {
     });
 
     carSelectGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, carSelectScene);
-    nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", "Next>");
-    prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<Prev");
-    selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select Car");
-    backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "< Back");
+    nextBtn = BABYLON.GUI.Button.CreateSimpleButton("nextBtn", ">");
+    prevBtn = BABYLON.GUI.Button.CreateSimpleButton("prevBtn", "<");
+    selectBtn = BABYLON.GUI.Button.CreateSimpleButton("selectBtn", "Select");
+    backBtn = BABYLON.GUI.Button.CreateSimpleButton("backBtn", "<");
     formatBtn(nextBtn);
     formatBtn(prevBtn);
     nextBtn.width = "10%";
@@ -157,7 +166,44 @@ var createCarSelectScene = function() {
 };
 
 var createGameScene = function() {
+    var gameGUI, frameGUI, scoreGUI, scoreOUTLINE, frameOUTLINE;
+
     gameScene = new BABYLON.Scene(engine);
+    gameScene.createDefaultCameraOrLight(true, true, true);
+
+
+    gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+
+    frameGUI = new BABYLON.GUI.TextBlock();
+    scoreGUI = new BABYLON.GUI.TextBlock();
+
+    scoreOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", ""); //Morph into textblock?
+    frameOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("fOUTLINE", ""); //Morph into textblock?
+
+    formatTextGUI(frameGUI);
+    formatTextGUI(scoreGUI);
+    formatBtn(scoreOUTLINE);
+    formatBtn(frameOUTLINE);
+    frameGUI.text = "Frame: ^X";
+    frameGUI.top = "-40%";
+    frameGUI.left = "40%";
+    scoreGUI.text = "Score: Y";
+    scoreGUI.top = "-45%";
+    scoreGUI.left = "40%";
+
+    scoreOUTLINE.top = "-40%";
+    scoreOUTLINE.left = "40%";
+    scoreOUTLINE.height = "5%";
+    scoreOUTLINE.width = "20%";
+    frameOUTLINE.top = "-45%";
+    frameOUTLINE.left = "40%";
+    frameOUTLINE.height = "5%";
+    frameOUTLINE.width = "20%";
+
+    gameGUI.addControl(scoreOUTLINE);
+    gameGUI.addControl(frameOUTLINE);
+    gameGUI.addControl(frameGUI);
+    gameGUI.addControl(scoreGUI);
 
     return gameScene;
 };
