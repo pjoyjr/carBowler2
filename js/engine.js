@@ -246,7 +246,7 @@ var addObjects = function() {
     //Function to add all non moving objects to scene
 
     //scene and objects
-    var ground, groundMaterial, water, waterMesh;
+    var skybox, skyboxMaterial, ground, groundMaterial, water, waterMesh;
     var lane, laneMesh, laneMeshMat;
     var rampMesh, rampMeshMat;
     var island, islandMat;
@@ -262,20 +262,28 @@ var addObjects = function() {
     //var pinMeshAlpha = 0;
 
     // Skybox
+    skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, gameScene);
+    skyboxMaterial = new BABYLON.StandardMaterial("skyBox", gameScene);
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/TropicalSunnyDay", gameScene);
+    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.disableLighting = true;
+    skybox.material = skyboxMaterial;
 
     // Ground
     groundMaterial = new BABYLON.StandardMaterial("groundMaterial", gameScene);
-    groundMaterial.diffuseTexture = new BABYLON.Texture("/img/ground.jpg", gameScene);
+    groundMaterial.diffuseTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/ground.jpg", gameScene);
     groundMaterial.diffuseTexture.uScale = groundMaterial.diffuseTexture.vScale = 4;
     ground = BABYLON.Mesh.CreateGround("ground", 512, 512, 32, gameScene, false);
     ground.position.y = -1;
     ground.material = groundMaterial;
 
     // Water
-    /*
     waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, gameScene, false);
     water = new BABYLON.WaterMaterial("water", gameScene);
-    water.bumpTexture = new BABYLON.Texture("../img/waterbump.png", gameScene);
+    water.bumpTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/waterbump.png", gameScene);
     water.windForce = -45;
     water.waveHeight = .5;
     water.windDirection = new BABYLON.Vector2(0, 1);
@@ -286,7 +294,7 @@ var addObjects = function() {
 
     water.addToRenderList(ground);
     waterMesh.material = water;
-    */
+
     //CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
     //lane with ramp obj from blender
     /*
@@ -329,7 +337,7 @@ var addObjects = function() {
     island.position = new BABYLON.Vector3(0, 0, 170);
     islandMat = new BABYLON.StandardMaterial("islandMat", gameScene);
     islandMat.alpha = islandMatAlpha;
-    islandMat.diffuseTexture = new BABYLON.Texture("../texture/planks.jpg", gameScene);
+    islandMat.diffuseTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/planks.jpg", gameScene);
     island.material = islandMat;
 
     //physics imposters
@@ -347,13 +355,13 @@ var createGameScene = function() {
 
     //CREATE CAMERA & LIGHTING
     //left view
-    //cam =  new BABYLON.FreeCamera('cam', new BABYLON.Vector3(-125, 50, -125), scene);
+    cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(-125, 50, -125), gameScene);
     //behind view
-    //cam =  new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 50, -250), scene);
+    //cam =  new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 50, -250), gameScene);
     //top view
-    cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -200), gameScene);
+    //cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -200), gameScene);
     //ARCROTATE Camera
-    //cam = new BABYLON.ArcRotateCamera("cam", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), scene);
+    //cam = new BABYLON.ArcRotateCamera("cam", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), gameScene);
     cam.attachControl(canvas, true);
 
     light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 50, 0), gameScene);
