@@ -5,23 +5,6 @@
 	y-axis refers to parallel to lane
 */
 
-//scene and objects
-var scene, camera, light;
-var skybox, skyboxMaterial, ground, groundMaterial, water, waterMesh;
-var lane, laneMesh, laneMeshMat;
-var rampMesh, rampMeshMat;
-var island, islandMat;
-var car, carMesh, carMeshMat;
-var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
-var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10, pinMesh;
-
-//alphas for testing
-var carMeshAlpha = 0;
-var laneMeshAlpha = 0;
-var rampMeshAlpha = 0;
-var islandMeshAlpha = 0;
-var islandMatAlpha = 1; //leave at 1
-var pinMeshAlpha = 0;
 
 //car variables
 var speed = 0;
@@ -54,103 +37,7 @@ var threeThrowAgo = 0;
 var remainingPins = [true, true, true, true, true, true, true, true, true, true];
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
 
-/*
- * Function to add all non moving objects to scene
- */
-function addObjects() {
-    /*
-     * CREATE SKYBOX
-     */
-    skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
-    skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-    skyboxMaterial.backFaceCulling = false;
-    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/TropicalSunnyDay", scene);
-    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    skyboxMaterial.disableLighting = true;
-    skybox.material = skyboxMaterial;
 
-    /*
-     * CREATE GROUND
-     */
-    groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-    groundMaterial.diffuseTexture = new BABYLON.Texture("textures/ground.jpg", scene);
-    groundMaterial.diffuseTexture.uScale = groundMaterial.diffuseTexture.vScale = 4;
-
-    ground = BABYLON.Mesh.CreateGround("ground", 512, 512, 32, scene, false);
-    ground.position.y = -1;
-    ground.material = groundMaterial;
-
-    /*
-     * CREATE WATER AND MODIFIY PROPERTIES
-     */
-    waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
-    water = new BABYLON.WaterMaterial("water", scene);
-    water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
-    water.windForce = -45;
-    water.waveHeight = .5;
-    water.windDirection = new BABYLON.Vector2(0, 1);
-    water.waterColor = new BABYLON.Color3(0.6, 0.0, 0.6);
-    water.colorBlendFactor = 0.3;
-    water.bumpHeight = 0.1;
-    water.waveLength = 0.1;
-
-    // Add skybox and ground to the reflection and refraction
-    water.addToRenderList(skybox);
-    water.addToRenderList(ground);
-    waterMesh.material = water;
-
-    /*
-     * CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
-     */
-    //lane with ramp obj from blender
-    BABYLON.SceneLoader.ImportMesh("Lane", "obj/", "lane.babylon", scene,
-        function(newMeshes) {
-            lane = newMeshes[0];
-            lane.position = new BABYLON.Vector3(0, 3, -100);
-            lane.scaling = new BABYLON.Vector3(30, 8, 120);
-        });
-
-    //lane mesh for collision
-    laneMesh = BABYLON.MeshBuilder.CreateBox("laneMesh", { height: 10, width: 56, depth: 230 }, scene);
-    laneMesh.position = new BABYLON.Vector3(0, 5.75, -105);
-    laneMeshMat = new BABYLON.StandardMaterial(scene);
-    laneMeshMat.alpha = laneMeshAlpha;
-    laneMesh.material = laneMeshMat;
-    //ramp mesh for collisions
-    rampMesh = BABYLON.MeshBuilder.CreateBox("rampMesh", { height: 10, width: 56, depth: 70 }, scene);
-    rampMesh.position = new BABYLON.Vector3(0, 7.5, -11);
-    rampMesh.rotation.x = 31 * Math.PI / 40;
-    rampMeshMat = new BABYLON.StandardMaterial(scene);
-    rampMeshMat.alpha = rampMeshAlpha;
-    rampMesh.material = rampMeshMat;
-
-    /*
-     * CREATE ISLAND FOR PINS
-     */
-    //island for collision and bounce
-    islandMesh = BABYLON.MeshBuilder.CreateBox("islandMesh", { height: 22, width: 70, depth: 70 }, scene);
-    islandMesh.position = new BABYLON.Vector3(0, 0, 170);
-    islandMeshMat = new BABYLON.StandardMaterial("islandMeshMat", scene);
-    islandMeshMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
-    islandMeshMat.alpha = islandMeshAlpha;
-
-    //island where pins pins sit on
-    islandMesh.material = islandMeshMat;
-    island = BABYLON.MeshBuilder.CreateBox("island", { height: 14, width: 70, depth: 70 }, scene);
-    island.position = new BABYLON.Vector3(0, 0, 170);
-    islandMat = new BABYLON.StandardMaterial("islandMat", scene);
-    islandMat.alpha = islandMatAlpha;
-    islandMat.diffuseTexture = new BABYLON.Texture("planks.jpg", scene);
-    island.material = islandMat;
-
-    //physics imposters
-    ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, scene);
-    islandMesh.physicsImpostor = new BABYLON.PhysicsImpostor(islandMesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, scene);
-    laneMesh.physicsImpostor = new BABYLON.PhysicsImpostor(laneMesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, scene);
-    rampMesh.physicsImpostor = new BABYLON.PhysicsImpostor(rampMesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, scene);
-};
 /*
  * Function to add all pins for next bowl
  */
@@ -634,27 +521,6 @@ function gameLogic() {
 //create scene
 var createScene = function() {
     scene = new BABYLON.Scene(engine);
-    /*
-     * CREATE CAMERA & LIGHTING
-     */
-    //left view
-    //camera =  new BABYLON.FreeCamera('camera', new BABYLON.Vector3(-125, 50, -125), scene);
-    //behind view
-    //camera =  new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 50, -250), scene);
-    //top view
-    camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 45, -200), scene);
-    //ARCROTATE Camera
-    //camera = new BABYLON.ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), scene);
-    camera.attachControl(canvas, true);
-
-    light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 50, 0), scene);
-    light.intensity = .7;
-    /*
-     * CREATE PHYSICS ENGINE
-     */
-    var forceVector = new BABYLON.Vector3(0, -60, 0);
-    var physicsPlugin = new BABYLON.CannonJSPlugin();
-    scene.enablePhysics(forceVector, physicsPlugin);
 
     addObjects();
     gameLogic();
