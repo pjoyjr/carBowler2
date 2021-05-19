@@ -5,7 +5,6 @@
 	y-axis refers to parallel to lane
 */
 
-
 //car variables
 var speed = 0;
 var accel = 1.4;
@@ -38,9 +37,7 @@ var remainingPins = [true, true, true, true, true, true, true, true, true, true]
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
 
 
-/*
- * Function to add all pins for next bowl
- */
+//Function to add all pins for next bowl
 function setupPins(pinsStanding) {
     //CREATE FAKE PIN COLLISION BOUNDS
     pinMesh = new BABYLON.StandardMaterial(scene);
@@ -173,9 +170,7 @@ function setupPins(pinsStanding) {
     setup = true;
 };
 
-/*
- * Function to remove all pins for next bowl
- */
+//Function to remove all pins for next bowl
 function cleanupPins() {
     setup = false;
 
@@ -201,42 +196,13 @@ function cleanupPins() {
     pin10.dispose();
 };
 
-/*
- * Function to add car to scene
- */
-//create bounding box for physics engine
-function addCar() {
-    overRamp = false;
-    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, scene);
-    carMesh.position = new BABYLON.Vector3(0, 18, -180);
-    carMeshMat = new BABYLON.StandardMaterial(scene);
-    carMeshMat.alpha = carMeshAlpha;
-    carMeshMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    carMesh.material = carMeshMat;
-    //load in car from blender
-    BABYLON.SceneLoader.ImportMesh("Car", "obj/", "car.babylon", scene,
-        function(newMeshes) {
-            car = newMeshes[0];
-            car.scaling = new BABYLON.Vector3(3, 3, 5);
-            //car.position = new BABYLON.Vector3(0, 16, -180);
-            car.position = carMesh.getAbsolutePosition();
-        });
-    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, scene);
-
-
-};
-
-/*
- * Function to run all game logic
- */
+//Function to run all game logic
 function rmCar() {
     carMesh.dispose();
     car.dispose();
 };
 
-/*
- * Function to run all game logic
- */
+//Function to run all game logic
 function gameLogic() {
 
     /*
@@ -518,11 +484,11 @@ function gameLogic() {
     });
     console.log("Total Score: " + score);
 };
+
 //create scene
 var createScene = function() {
     scene = new BABYLON.Scene(engine);
 
-    addObjects();
     gameLogic();
 
     return scene;

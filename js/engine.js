@@ -19,6 +19,24 @@ var car1Angle = 210,
 
 var cube, cone, pill;
 
+//game variables
+var overRamp = false; //for checking to see if user can alter car
+var topFrame = true; //for checking first or second half of frame
+var setup = false; // for setting up pins
+var nextFrame = false;
+var extraFrame = false;
+
+
+var frameNum = 1;
+var startTimer, endTimer;
+var curRollCount = 0;
+var score = 0;
+var oneThrowAgo = 0; //for spare calculation
+var twoThrowAgo = 0; //for spare/strike calculation
+var threeThrowAgo = 0;
+var remainingPins = [true, true, true, true, true, true, true, true, true, true];
+var pinStanding = [true, true, true, true, true, true, true, true, true, true];
+
 var degToRadians = function(degrees) {
     var radians = degrees * Math.PI / 180;
     return radians;
@@ -37,6 +55,7 @@ var rotateCarSelectionPrev = function() {
     pill.position.x = Math.cos(degToRadians(car3Angle)) * radius;
     pill.position.z = Math.sin(degToRadians(car3Angle)) * radius - 1;
 };
+
 var rotateCarSelectionNext = function() {
     car1Angle -= 120;
     car2Angle -= 120;
@@ -90,24 +109,23 @@ var createMainMenuScene = function() {
 };
 
 var createCarSelectScene = function() {
-
     carSelectScene = new BABYLON.Scene(engine);
+
     carSelectScene.clearColor = new BABYLON.Color3.Purple();
     cam = new BABYLON.FreeCamera("cam", new BABYLON.Vector3(0, 10, 2), carSelectScene);
     cam.lockedTarget = new BABYLON.Vector3.Zero();
     cam.attachControl(canvas, true);
     light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), carSelectScene);
-    // light.intensity = 0.7;
 
     cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 2 }, carSelectScene);
+    cone = BABYLON.MeshBuilder.CreateCylinder("cone", { diameterTop: .25, height: 1, tessellation: 24 }, carSelectScene);
+    pill = new BABYLON.Mesh.CreateCapsule('pill', { radius: 0.5, height: 2 }, carSelectScene)
     cube.position.x = Math.cos(degToRadians(car1Angle)) * radius;
     cube.position.z = Math.sin(degToRadians(car1Angle)) * radius - 1;
-    cone = BABYLON.MeshBuilder.CreateCylinder("cone", { diameterTop: .25, height: 1, tessellation: 24 }, carSelectScene);
     cone.position.x = Math.cos(degToRadians(car2Angle)) * radius;
     cone.position.z = Math.sin(degToRadians(car2Angle)) * radius - 1;
     cone.rotation.x = 90;
     cone.rotation.z = 90;
-    pill = new BABYLON.Mesh.CreateCapsule('pill', { radius: 0.5, height: 2 }, carSelectScene)
     pill.position.x = Math.cos(degToRadians(car3Angle)) * radius;
     pill.position.z = Math.sin(degToRadians(car3Angle)) * radius - 1;
     pill.rotation.x = 90;
@@ -149,12 +167,10 @@ var createCarSelectScene = function() {
 
     backBtn.onPointerUpObservable.add(function() {
         currScene = 0;
-
     });
 
     selectBtn.onPointerUpObservable.add(function() {
         currScene = 2;
-
     });
 
     carSelectGUI.addControl(nextBtn);
@@ -200,10 +216,33 @@ var createGameGUI = function() {
     gameGUI.addControl(frameOUTLINE);
     gameGUI.addControl(frameGUI);
     gameGUI.addControl(scoreGUI);
-}
+};
 
+//Function to add car to scene
+var addCar = function() {
+    overRamp = false;
+    //create bounding box for physics engine
+    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, scene);
+    carMesh.position = new BABYLON.Vector3(0, 18, -180);
+    carMeshMat = new BABYLON.StandardMaterial(scene);
+    carMeshMat.alpha = carMeshAlpha;
+    carMeshMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    carMesh.material = carMeshMat;
+    //load in car from blender
+    /*
+    BABYLON.SceneLoader.ImportMesh("Car", "obj/", "car.babylon", scene,
+        function(newMeshes) {
+            car = newMeshes[0];
+            car.scaling = new BABYLON.Vector3(3, 3, 5);
+            //car.position = new BABYLON.Vector3(0, 16, -180);
+            car.position = carMesh.getAbsolutePosition();
+        });
+    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, scene);
+    */
 
-function addObjects() {
+};
+
+var addObjects = function() {
     //Function to add all non moving objects to scene
 
     //scene and objects
@@ -262,15 +301,12 @@ function addObjects() {
 
     //CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
     //lane with ramp obj from blender
-    /*
-    BABYLON.SceneLoader.ImportMesh("Lane", "obj/", "lane.babylon", gameScene,
+    BABYLON.SceneLoader.ImportMesh("lane", "./obj/", "lane.babylon", gameScene,
         function(newMeshes) {
             lane = newMeshes[0];
             lane.position = new BABYLON.Vector3(0, 3, -100);
             lane.scaling = new BABYLON.Vector3(30, 8, 120);
         });
-    */
-
     //lane mesh for collision
     laneMesh = BABYLON.MeshBuilder.CreateBox("laneMesh", { height: 10, width: 56, depth: 230 }, gameScene);
     laneMesh.position = new BABYLON.Vector3(0, 5.75, -105);
