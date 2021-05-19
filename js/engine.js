@@ -165,12 +165,8 @@ var createCarSelectScene = function() {
     return carSelectScene;
 };
 
-var createGameScene = function() {
+var createGameGUI = function(gameScene) {
     var gameGUI, frameGUI, scoreGUI, scoreOUTLINE, frameOUTLINE;
-
-    gameScene = new BABYLON.Scene(engine);
-    gameScene.createDefaultCameraOrLight(true, true, true);
-
 
     gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
 
@@ -204,6 +200,16 @@ var createGameScene = function() {
     gameGUI.addControl(frameOUTLINE);
     gameGUI.addControl(frameGUI);
     gameGUI.addControl(scoreGUI);
+}
+
+var createGameScene = function() {
+
+    gameScene = new BABYLON.Scene(engine);
+    gameScene.createDefaultCameraOrLight(true, true, true);
+
+    createGameGUI();
+
+
 
     return gameScene;
 };
