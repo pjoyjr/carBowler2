@@ -94,7 +94,7 @@ var createMainMenuScene = function() {
     mainMenuScene = new BABYLON.Scene(engine);
     mainMenuScene.createDefaultCameraOrLight(true, true, true);
 
-    bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/img/bg.png', mainMenuScene, true);
+    bgLayer = new BABYLON.Layer('', 'https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/bg.png', mainMenuScene, true);
 
     mainMenuGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, mainMenuScene);
     playBtn = BABYLON.GUI.Button.CreateSimpleButton("playBtn", "Play!");
@@ -255,9 +255,9 @@ var addObjects = function() {
     //var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10, pinMesh;
     //alphas for testing
     var carMeshAlpha = 1;
-    var laneMeshAlpha = 1;
-    var rampMeshAlpha = 1;
-    var islandMeshAlpha = 1;
+    var laneMeshAlpha = 0;
+    var rampMeshAlpha = 0;
+    var islandMeshAlpha = 0;
     var islandMatAlpha = 1; //leave at 1
     //var pinMeshAlpha = 0;
 
@@ -272,6 +272,7 @@ var addObjects = function() {
     ground.material = groundMaterial;
 
     // Water
+    /*
     waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, gameScene, false);
     water = new BABYLON.WaterMaterial("water", gameScene);
     water.bumpTexture = new BABYLON.Texture("../img/waterbump.png", gameScene);
@@ -285,7 +286,7 @@ var addObjects = function() {
 
     water.addToRenderList(ground);
     waterMesh.material = water;
-
+    */
     //CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
     //lane with ramp obj from blender
     /*
@@ -328,7 +329,7 @@ var addObjects = function() {
     island.position = new BABYLON.Vector3(0, 0, 170);
     islandMat = new BABYLON.StandardMaterial("islandMat", gameScene);
     islandMat.alpha = islandMatAlpha;
-    islandMat.diffuseTexture = new BABYLON.Texture("planks.jpg", gameScene);
+    islandMat.diffuseTexture = new BABYLON.Texture("../texture/planks.jpg", gameScene);
     island.material = islandMat;
 
     //physics imposters
