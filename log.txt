@@ -5,11 +5,17 @@ TODO:
 rotate meshes in place in carSelectScene DONE
 rotate meshes when < or > are clicked in carSelectScene DONE
 
-create scene with actual game
-create gui for game (score, frame)
+create scene with actual game DONE
+create gui for game (score, frame) DONE
 import rest of game code from pjoyjr.github.io/carBowling
 
+
+FUTURE ADDONS:
+Music Sound effects
+leaderboard
+
 NOTES:
+AT PIN SETUP. MAKE DYNAMIC.
 
 for Vector3(x,z,y)
 x-axis refers to perpendicular to lane
