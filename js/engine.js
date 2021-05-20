@@ -247,8 +247,9 @@ var addStationaryObjects = function() {
     var rampMesh, rampMeshMat;
     var island, islandMat;
     //alphas for testing
-    var laneMeshAlpha = 1;
-    var rampMeshAlpha = 1;
+    var carMeshAlpha = 0;
+    var laneMeshAlpha = 0;
+    var rampMeshAlpha = 0;
     var islandMeshAlpha = 0;
     var islandMatAlpha = 1; //leave at 1
 
@@ -288,33 +289,31 @@ var addStationaryObjects = function() {
     water.addToRenderList(ground);
     waterMesh.material = water;
 
-    //CREATE LANE W/ RAMP & COLLISON BOXES FOR VEHICLE
-    //lane with ramp obj from blender
-    /*
-    BABYLON.SceneLoader.ImportMesh("lane", "obj/", "lane.babylon", gameScene,
-        function(meshes) {
-            lane = meshes[0];
-            lane.position = new BABYLON.Vector3(0, 3, -100);
-            lane.scaling = new BABYLON.Vector3(30, 8, 120);
-        });
-    */
-
     //lane mesh for collision
     laneMesh = BABYLON.MeshBuilder.CreateBox("laneMesh", { height: 10, width: 56, depth: 230 }, gameScene);
     laneMesh.position = new BABYLON.Vector3(0, 5.75, -105);
     laneMeshMat = new BABYLON.StandardMaterial(gameScene);
     laneMeshMat.alpha = laneMeshAlpha;
-    laneMeshMat.diffuseTexture = planksTexture;
     laneMesh.material = laneMeshMat;
-
     //ramp mesh for collisions
     rampMesh = BABYLON.MeshBuilder.CreateBox("rampMesh", { height: 10, width: 56, depth: 70 }, gameScene);
     rampMesh.position = new BABYLON.Vector3(0, 7.5, -11);
     rampMesh.rotation.x = 31 * Math.PI / 40;
     rampMeshMat = new BABYLON.StandardMaterial(gameScene);
     rampMeshMat.alpha = rampMeshAlpha;
-    rampMeshMat.diffuseTexture = planksTexture;
     rampMesh.material = rampMeshMat;
+
+    //lane with ramp obj from blender
+    BABYLON.SceneLoader.ImportMesh("Lane", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/lane.babylon", gameScene,
+        function(newMeshes) {
+            lane = newMeshes[0];
+            lane.position = new BABYLON.Vector3(0, 3, -100);
+            lane.scaling = new BABYLON.Vector3(30, 8, 120);
+            var copyMat = laneMeshMat;
+            copyMat.alpha = 1;
+            copyMat.diffuseTexture = planksTexture;
+            lane.material = copyMat;
+        });
 
     //CREATE ISLAND FOR PINS
     //island for collision and bounce
