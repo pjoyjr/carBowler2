@@ -42,10 +42,8 @@ var threeThrowAgo = 0;
 var remainingPins = [true, true, true, true, true, true, true, true, true, true];
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
 var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
-var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10, pinMesh;
-var pinMeshAlpha = 0;
-var pinArray = [pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10];
-var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
+var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10;
+var pinMesh, pinMeshAlpha = 0;
 
 //car variables
 var speed = 0;
@@ -223,14 +221,15 @@ var createGameGUI = function() {
     scoreGUI.top = "-45%";
     scoreGUI.left = "40%";
 
-    scoreOUTLINE.top = "-40%";
-    scoreOUTLINE.left = "40%";
-    scoreOUTLINE.height = "5%";
-    scoreOUTLINE.width = "20%";
-    frameOUTLINE.top = "-45%";
+
+    frameOUTLINE.top = "-40%";
     frameOUTLINE.left = "40%";
     frameOUTLINE.height = "5%";
     frameOUTLINE.width = "20%";
+    scoreOUTLINE.top = "-45%";
+    scoreOUTLINE.left = "40%";
+    scoreOUTLINE.height = "5%";
+    scoreOUTLINE.width = "20%";
 
     gameGUI.addControl(scoreOUTLINE);
     gameGUI.addControl(frameOUTLINE);
@@ -247,7 +246,6 @@ var addStationaryObjects = function() {
     var rampMesh, rampMeshMat;
     var island, islandMat;
     //alphas for testing
-    var carMeshAlpha = 0;
     var laneMeshAlpha = 0;
     var rampMeshAlpha = 0;
     var islandMeshAlpha = 0;
@@ -342,7 +340,7 @@ var addStationaryObjects = function() {
 //Function to add car to scene
 var addCar = function() {
     var carMeshMat;
-    var carMeshAlpha = 1;
+    var carMeshAlpha = 0;
 
     overRamp = false;
     //create bounding box for physics engine
@@ -354,7 +352,7 @@ var addCar = function() {
     carMesh.material = carMeshMat;
 
     //load in car from blender
-    BABYLON.SceneLoader.ImportMesh("car", "obj/", "car.babylon", gameScene,
+    BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
             car.scaling = new BABYLON.Vector3(3, 3, 5);
@@ -374,72 +372,161 @@ var rmCar = function() {
 
 //Function to add all pins for next bowl
 var setupPins = function(pinsStanding) {
-
     //CREATE FAKE PIN COLLISION BOUNDS
     pinMesh = new BABYLON.StandardMaterial(gameScene);
     pinMesh.alpha = pinMeshAlpha;
     var pinDIM = { height: 30, diameterTop: 5, diameterBottom: 9, tessellation: 12 };
 
     //REAL PINS
-    for (var i = 0; i < pinsStanding.length; i = i + 1) {
-        if (pinsStanding[i]) {
-            BABYLON.SceneLoader.ImportMesh("Pin", "obj/", "pin.babylon", gameScene,
-                function(newMeshes) {
-                    pinBArray[i] = BABYLON.MeshBuilder.CreateCylinder("pin", pinDIM, gameScene);
-                    switch (i) {
-                        case 0:
-                            pinBArray[i].position = new BABYLON.Vector3(0, 42, 148);
-                            break;
-                        case 1:
-                            pinBArray[i].position = new BABYLON.Vector3(-7.5, 42, 163);
-                            break;
-                        case 2:
-                            pinBArray[i].position = new BABYLON.Vector3(7.5, 42, 163);
-                            break;
-                        case 3:
-                            pinBArray[i].position = new BABYLON.Vector3(-15, 42, 178);
-                            break;
-                        case 4:
-                            pinBArray[i].position = new BABYLON.Vector3(0, 42, 178);
-                            break;
-                        case 5:
-                            pinBArray[i].position = new BABYLON.Vector3(15, 42, 178);
-                            break;
-                        case 6:
-                            pinBArray[i].position = new BABYLON.Vector3(-22.5, 42, 193);
-                            break;
-                        case 7:
-                            pinBArray[i].position = new BABYLON.Vector3(-7.5, 42, 193);
-                            break;
-                        case 8:
-                            pinBArray[i].position = new BABYLON.Vector3(7.5, 42, 193);
-                            break;
-                        case 9:
-                            pinBArray[i].position = new BABYLON.Vector3(22.5, 42, 193);
-                            break;
-                    }
-                    pinBArray[i].material = pinMesh;
-                    pinBArray[i].physicsImpostor = new BABYLON.PhysicsImpostor(pinBArray[i], BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
-                    pinArray[i] = newMeshes[0];
-                    pinArray[i].scaling = new BABYLON.Vector3(5, 5, 5);
-                    pinArray[i].parent = pinBArray[i];
+    if (pinsStanding[0]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB1 = BABYLON.MeshBuilder.CreateCylinder("pinB1", pinDIM, gameScene);
+                pinB1.position = new BABYLON.Vector3(0, 42, 148);
+                pinB1.material = pinMesh;
+                pinB1.physicsImpostor = new BABYLON.PhysicsImpostor(pinB1, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin1 = newMeshes[0];
+                pin1.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin1.parent = pinB1;
 
-                });
-        };
-    }
+            });
+    };
+    if (pinsStanding[1]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB2 = BABYLON.MeshBuilder.CreateCylinder("pinB2", pinDIM, gameScene);
+                pinB2.position = new BABYLON.Vector3(-7.5, 42, 163);
+                pinB2.material = pinMesh;
+                pinB2.physicsImpostor = new BABYLON.PhysicsImpostor(pinB2, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin2 = newMeshes[0];
+                pin2.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin2.parent = pinB2;
+            });
+    };
+    if (pinsStanding[2]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB3 = BABYLON.MeshBuilder.CreateCylinder("pinB3", pinDIM, gameScene);
+                pinB3.position = new BABYLON.Vector3(7.5, 42, 163);
+                pinB3.material = pinMesh;
+                pinB3.physicsImpostor = new BABYLON.PhysicsImpostor(pinB3, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin3 = newMeshes[0];
+                pin3.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin3.parent = pinB3;
+            });
+    };
+    if (pinsStanding[3]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB4 = BABYLON.MeshBuilder.CreateCylinder("pinB4", pinDIM, gameScene);
+                pinB4.position = new BABYLON.Vector3(-15, 42, 178);
+                pinB4.material = pinMesh;
+                pinB4.physicsImpostor = new BABYLON.PhysicsImpostor(pinB4, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin4 = newMeshes[0];
+                pin4.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin4.parent = pinB4;
+            });
+    };
+    if (pinsStanding[4]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB5 = BABYLON.MeshBuilder.CreateCylinder("pinB5", pinDIM, gameScene);
+                pinB5.position = new BABYLON.Vector3(0, 42, 178);
+                pinB5.material = pinMesh;
+                pinB5.physicsImpostor = new BABYLON.PhysicsImpostor(pinB5, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin5 = newMeshes[0];
+                pin5.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin5.parent = pinB5;
+
+            });
+    };
+    if (pinsStanding[5]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB6 = BABYLON.MeshBuilder.CreateCylinder("pinB6", pinDIM, gameScene);
+                pinB6.position = new BABYLON.Vector3(15, 42, 178);
+                pinB6.material = pinMesh;
+                pinB6.physicsImpostor = new BABYLON.PhysicsImpostor(pinB6, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin6 = newMeshes[0];
+                pin6.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin6.parent = pinB6;
+            });
+    };
+    if (pinsStanding[6]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB7 = BABYLON.MeshBuilder.CreateCylinder("pinB7", pinDIM, gameScene);
+                pinB7.position = new BABYLON.Vector3(-22.5, 42, 193);
+                pinB7.material = pinMesh;
+                pinB7.physicsImpostor = new BABYLON.PhysicsImpostor(pinB7, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin7 = newMeshes[0];
+                pin7.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin7.parent = pinB7;
+            });
+    };
+    if (pinsStanding[7]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB8 = BABYLON.MeshBuilder.CreateCylinder("pinB8", pinDIM, gameScene);
+                pinB8.position = new BABYLON.Vector3(-7.5, 42, 193);
+                pinB8.material = pinMesh;
+                pinB8.physicsImpostor = new BABYLON.PhysicsImpostor(pinB8, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin8 = newMeshes[0];
+                pin8.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin8.parent = pinB8;
+            });
+    };
+    if (pinsStanding[8]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB9 = BABYLON.MeshBuilder.CreateCylinder("pinB9", pinDIM, gameScene);
+                pinB9.position = new BABYLON.Vector3(7.5, 42, 193);
+                pinB9.material = pinMesh;
+                pinB9.physicsImpostor = new BABYLON.PhysicsImpostor(pinB9, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin9 = newMeshes[0];
+                pin9.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin9.parent = pinB9;
+            });
+    };
+    if (pinsStanding[9]) {
+        BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
+            function(newMeshes) {
+                pinB10 = BABYLON.MeshBuilder.CreateCylinder("pinB10", pinDIM, gameScene);
+                pinB10.position = new BABYLON.Vector3(22.5, 42, 193);
+                pinB10.material = pinMesh;
+                pinB10.physicsImpostor = new BABYLON.PhysicsImpostor(pinB10, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
+                pin10 = newMeshes[0];
+                pin10.scaling = new BABYLON.Vector3(5, 5, 5);
+                pin10.parent = pinB10;
+            });
+    };
     setup = true;
 };
 
 //Function to remove all pins for next bowl
-function cleanupPins() {
+var cleanupPins = function() {
     setup = false;
-    for (var i = 0; i < pinArray.length; i = i + 1) {
-        pinArray[i].dispose();
-    }
 
-    for (var j = 0; j < pinBArray.length; j = j + 1) {
-        pinBArray[j].dispose();
-    }
+    pinB1.dispose();
+    pin1.dispose();
+    pinB2.dispose();
+    pin2.dispose();
+    pinB3.dispose();
+    pin3.dispose();
+    pinB4.dispose();
+    pin4.dispose();
+    pinB5.dispose();
+    pin5.dispose();
+    pinB6.dispose();
+    pin6.dispose();
+    pinB7.dispose();
+    pin7.dispose();
+    pinB8.dispose();
+    pin8.dispose();
+    pinB9.dispose();
+    pin9.dispose();
+    pinB10.dispose();
+    pin10.dispose();
 };
 
 var addGameLogic = function() {
@@ -463,6 +550,13 @@ var addGameLogic = function() {
     /************************************ BASIC GAME/FRAME IMPLEMENTATION*************************************/
     /*********************************************************************************************************/
     gameScene.registerAfterRender(function() {
+        if (topFrame) {
+            frameGUI.text = "Top " + frameNum;
+        } else {
+            frameGUI.text = "Bot " + frameNum;
+        }
+        scoreGUI.text = "Score: " + score;
+
         if (topFrame && !setup && (frameNum < 11 || extraFrame)) {
             if (extraFrame) {
                 extraFrame = false;
@@ -470,7 +564,6 @@ var addGameLogic = function() {
             addCar();
             cam.position = new BABYLON.Vector3(0, 40, -250);
             cam.lockedTarget = carMesh.getAbsolutePosition();
-            setup = true;
             setupPins(pinStanding);
         };
         if (!topFrame && !setup && (frameNum < 11 || extraFrame)) {
@@ -480,7 +573,6 @@ var addGameLogic = function() {
             addCar();
             cam.position = new BABYLON.Vector3(0, 40, -250);
             cam.lockedTarget = carMesh.getAbsolutePosition();
-            setup = true;
             setupPins(remainingPins);
         };
         if (carMesh.getAbsolutePosition().z > 25 && !overRamp && setup) {
@@ -516,15 +608,67 @@ var addGameLogic = function() {
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
             if ((endTimer - startTimer) >= 10000) { //CALCULATE SCORE
-                for (var i = 0; i < remainingPins.length; i = i + 1) {
-                    if (remainingPins[i] == true) {
-                        //check if pinBx.getAbsolutePivotPoint().z is > 20 if so add to counter
-                        if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
-                            remainingPins[i] = false;
-                            curRollCount += 1;
-                        };
+                if (remainingPins[0] == true) {
+                    //check if pinBx.getAbsolutePivotPoint().z is > 20 if so add to counter
+                    if (pinB1.getAbsolutePosition().y < 25.0 || pinB1.getAbsolutePosition().y > 27.0) {
+                        remainingPins[0] = false;
+                        curRollCount += 1;
                     };
-                }
+                };
+                if (remainingPins[1] == true) {
+                    if (pinB2.getAbsolutePosition().y < 25.0 || pinB2.getAbsolutePosition().y > 27.0) {
+                        remainingPins[1] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[2] == true) {
+                    if (pinB3.getAbsolutePosition().y < 25.0 || pinB3.getAbsolutePosition().y > 27.0) {
+                        remainingPins[2] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[3] == true) {
+                    if (pinB4.getAbsolutePosition().y < 25.0 || pinB4.getAbsolutePosition().y > 27.0) {
+                        remainingPins[3] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[4] == true) {
+                    if (pinB5.getAbsolutePosition().y < 25.0 || pinB5.getAbsolutePosition().y > 27.0) {
+                        remainingPins[4] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[5] == true) {
+                    if (pinB6.getAbsolutePosition().y < 25.0 || pinB6.getAbsolutePosition().y > 27.0) {
+                        remainingPins[5] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[6] == true) {
+                    if (pinB7.getAbsolutePosition().y < 25.0 || pinB7.getAbsolutePosition().y > 27.0) {
+                        remainingPins[6] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[7] == true) {
+                    if (pinB8.getAbsolutePosition().y < 25.0 || pinB8.getAbsolutePosition().y > 27.0) {
+                        remainingPins[7] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[8] == true) {
+                    if (pinB9.getAbsolutePosition().y < 25.0 || pinB9.getAbsolutePosition().y > 27.0) {
+                        remainingPins[8] = false;
+                        curRollCount += 1;
+                    };
+                };
+                if (remainingPins[9] == true) {
+                    if (pinB10.getAbsolutePosition().y < 25.0 || pinB10.getAbsolutePosition().y > 27.0) {
+                        remainingPins[9] = false;
+                        curRollCount += 1;
+                    };
+                };
 
                 //changing states
                 if (frameNum == 11) { //top of 11th frame
@@ -649,12 +793,6 @@ var addGameLogic = function() {
             carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
         };
     });
-    if (topFrame) {
-        frameGUI.text = "Top " + frameNum;
-    } else {
-        frameGUI.text = "Bot " + frameNum;
-    }
-    scoreGUI.text = "Score: " + score;
 };
 
 var createGameScene = function() {
@@ -663,7 +801,7 @@ var createGameScene = function() {
 
     //CREATE CAMERA & LIGHTING
     cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(-125, 50, -125), gameScene); //left view
-    //cam =  new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 50, -250), gameScene); //behind view
+    //cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 50, -250), gameScene); //behind view
     //cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -200), gameScene); //top view
     //cam = new BABYLON.ArcRotateCamera("cam", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), gameScene); //ARCROTATE Camera
     cam.attachControl(canvas, true);
