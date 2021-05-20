@@ -263,6 +263,8 @@ var addObjects = function() {
     var islandMatAlpha = 1; //leave at 1
     //var pinMeshAlpha = 0;
 
+    var planksTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/planks.jpg", gameScene);
+
     // Skybox
     skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, gameScene);
     skyboxMaterial = new BABYLON.StandardMaterial("skyBox", gameScene);
@@ -313,6 +315,7 @@ var addObjects = function() {
     laneMesh.position = new BABYLON.Vector3(0, 5.75, -105);
     laneMeshMat = new BABYLON.StandardMaterial(gameScene);
     laneMeshMat.alpha = laneMeshAlpha;
+    laneMeshMat.diffuseTexture = planksTexture;
     laneMesh.material = laneMeshMat;
 
     //ramp mesh for collisions
@@ -322,6 +325,7 @@ var addObjects = function() {
     rampMesh.rotation.x = 31 * Math.PI / 40;
     rampMeshMat = new BABYLON.StandardMaterial(gameScene);
     rampMeshMat.alpha = rampMeshAlpha;
+    rampMeshMat.diffuseTexture = planksTexture;
     rampMesh.material = rampMeshMat;
 
     //CREATE ISLAND FOR PINS
@@ -339,7 +343,7 @@ var addObjects = function() {
     island.position = new BABYLON.Vector3(0, 0, 170);
     islandMat = new BABYLON.StandardMaterial("islandMat", gameScene);
     islandMat.alpha = islandMatAlpha;
-    islandMat.diffuseTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/planks.jpg", gameScene);
+    islandMat.diffuseTexture = planksTexture;
     island.material = islandMat;
 
     //physics imposters
