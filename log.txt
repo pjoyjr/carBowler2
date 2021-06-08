@@ -1,14 +1,8 @@
 BUGS:
-Objects dont render on first load to carSelectScene.  FIXED
-Unable to import blender objects successfully.
+Strike needs to advance to next frame instead of bottom of frame
 
 TODO:
-rotate meshes in place in carSelectScene DONE
-rotate meshes when < or > are clicked in carSelectScene DONE
-
-create scene with actual game DONE
-create gui for game (score, frame) DONE
-import rest of game code from pjoyjr.github.io/carBowling DONE
+Fix End Game
 
 
 FUTURE ADDONS:
