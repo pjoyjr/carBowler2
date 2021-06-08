@@ -3,9 +3,11 @@ Strike needs to advance to next frame instead of bottom of frame
 
 TODO:
 Fix End Game
+Fix car mechanics
 
 
 FUTURE ADDONS:
+Multiple cars when certain scores achieved
 Music Sound effects
 leaderboard
 

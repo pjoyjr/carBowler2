@@ -575,7 +575,7 @@ var addController = function() {
         }));
 };
 
-var carMotion = function() {
+var addCarMechanics = function() {
     if (map["w"] || map["W"]) {
         speed += accel;
         if (speed > MAXSPEED)
@@ -674,6 +674,33 @@ var calculateScore = function() {
     }
 };
 
+var setupForThrow = function() {
+    /*
+    if (extraFrame)
+        extraFrame = false;
+    */
+    addCar();
+    cam.position = new BABYLON.Vector3(0, 40, -250);
+    cam.lockedTarget = carMesh.getAbsolutePosition();
+    if (topFrame)
+        setupPins(pinStanding);
+    else
+        setupPins(remainingPins);
+    isSetup = true;
+};
+
+var cleanupFrame = function() {
+    countStandingPins();
+    rmCar();
+    cleanupPins();
+    topFrame = !topFrame;
+    threeThrowAgo = twoThrowAgo;
+    twoThrowAgo = oneThrowAgo;
+    oneThrowAgo = curRollCount;
+    scoreboard.push(curRollCount);
+    curRollCount = 0;
+};
+
 var addGameLogic = function() {
     addController();
 
@@ -681,36 +708,22 @@ var addGameLogic = function() {
         updateGUI();
 
         //setup pins for next throw if needed 
-        if (!isSetup && (frameNum < 11 || extraFrame)) {
-            if (extraFrame)
-                extraFrame = false;
-            addCar();
-            cam.position = new BABYLON.Vector3(0, 40, -250);
-            cam.lockedTarget = carMesh.getAbsolutePosition();
-            if (topFrame)
-                setupPins(pinStanding);
-            else
-                setupPins(remainingPins);
-            isSetup = true;
-        }
+        if (!isSetup && (frameNum < 11 || extraFrame))
+            setupForThrow();
 
         if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
             overRamp = true;
             startTimer = new Date();
         }
         if (!overRamp) {
-            carMotion();
+            addCarMechanics();
         } else { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
             if ((endTimer - startTimer) >= 12000) {
                 //Count pins knocked over after 12 secs
-                countStandingPins();
 
-                /*********************************************************************************************************/
-                /**************************************** FRAME MANAGEMENT ***********************************************/
-                /*********************************************************************************************************/
                 if (frameNum == 11 && !extraFrame) { //Game over
                     pass
                 } else if (frameNum == 11 && extraFrame) { //Extra Frame earned
@@ -722,17 +735,9 @@ var addGameLogic = function() {
                     if (oneThrowAgo == 10) { //top of 10th frame
                         extraFrame = true;
                     }
-                } else {
-                    rmCar();
-                    cleanupPins();
-                    topFrame = !topFrame;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    scoreboard.push(curRollCount);
-                    curRollCount = 0;
                 }
 
+                cleanupFrame();
                 frameNum = Math.floor(scoreboard.length / 2) + 1;
                 calculateScore();
             }
