@@ -25,10 +25,10 @@ var car, carMesh;
 
 
 //game and score variables
-var frameGUI, scoreGUI;
+var frameGUI, scoreGUI, speedGUI, score2GUI;
 var overRamp = false; //for checking to see if user can alter car
 var topFrame = true; //for checking first or second half of frame
-var setup = false; // for setting up pins
+var isSetup = false; // for setting up pins
 var map = {}; //object for multiple key presses
 
 var extraFrame = false;
@@ -51,8 +51,8 @@ var pinMesh, pinMeshAlpha = 0;
 
 //car variables
 var speed = 0;
-var accel = 1.4;
-var decel = -.75;
+var accel = .4667;
+var decel = -.25;
 var MAXSPEED = 20;
 
 //physics info for pins and car
@@ -204,41 +204,69 @@ var createCarSelectScene = function() {
 };
 
 var createGameGUI = function() {
-    var gameGUI, scoreOUTLINE, frameOUTLINE;
+    var gameGUI, scoreOUTLINE, frameOUTLINE, speedOUTLINE, score2OUTLINE;
 
     gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
 
     frameGUI = new BABYLON.GUI.TextBlock();
     scoreGUI = new BABYLON.GUI.TextBlock();
+    speedGUI = new BABYLON.GUI.TextBlock(); //maybe for testing only
+    score2GUI = new BABYLON.GUI.TextBlock(); //maybe for testing only
 
     scoreOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", ""); //Morph into textblock?
     frameOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("fOUTLINE", ""); //Morph into textblock?
+    speedOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("speedOUTLINE", ""); //maybe for testing only
+    score2OUTLINE = BABYLON.GUI.Button.CreateSimpleButton("score2OUTLINE", ""); //maybe for testing only
 
     formatTextGUI(frameGUI);
     formatTextGUI(scoreGUI);
+    formatTextGUI(speedGUI);
+    formatTextGUI(score2GUI);
     formatBtn(scoreOUTLINE);
     formatBtn(frameOUTLINE);
-    frameGUI.text = "Frame: ^X";
-    frameGUI.top = "-40%";
+    formatBtn(speedOUTLINE);
+    formatBtn(score2OUTLINE);
+    frameGUI.text = "Frame:";
+    frameGUI.top = "-45%";
     frameGUI.left = "40%";
-    scoreGUI.text = "Score: Y";
-    scoreGUI.top = "-45%";
+    scoreGUI.text = "Score:";
+    scoreGUI.top = "-40%";
     scoreGUI.left = "40%";
 
+    speedGUI.text = "Speed:";
+    speedGUI.top = "-35%";
+    speedGUI.left = "40%";
+    score2GUI.text = "Last Bowl:";
+    score2GUI.top = "-30%";
+    score2GUI.left = "40%";
 
-    frameOUTLINE.top = "-40%";
+
+    frameOUTLINE.top = "-45%";
     frameOUTLINE.left = "40%";
     frameOUTLINE.height = "5%";
     frameOUTLINE.width = "20%";
-    scoreOUTLINE.top = "-45%";
+    scoreOUTLINE.top = "-40%";
     scoreOUTLINE.left = "40%";
     scoreOUTLINE.height = "5%";
     scoreOUTLINE.width = "20%";
 
+    speedOUTLINE.top = "-35%";
+    speedOUTLINE.left = "40%";
+    speedOUTLINE.height = "5%";
+    speedOUTLINE.width = "20%";
+    score2OUTLINE.top = "-30%";
+    score2OUTLINE.left = "40%";
+    score2OUTLINE.height = "5%";
+    score2OUTLINE.width = "20%";
+
     gameGUI.addControl(scoreOUTLINE);
     gameGUI.addControl(frameOUTLINE);
+    gameGUI.addControl(speedOUTLINE);
+    gameGUI.addControl(score2OUTLINE);
     gameGUI.addControl(frameGUI);
     gameGUI.addControl(scoreGUI);
+    gameGUI.addControl(speedGUI);
+    gameGUI.addControl(score2GUI);
 };
 
 //Function to add all non moving objects to scene
@@ -394,7 +422,7 @@ var setupPins = function(pinsStanding) {
                 pin1.parent = pinB1;
 
             });
-    };
+    }
     if (pinsStanding[1]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -406,7 +434,7 @@ var setupPins = function(pinsStanding) {
                 pin2.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin2.parent = pinB2;
             });
-    };
+    }
     if (pinsStanding[2]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -418,7 +446,7 @@ var setupPins = function(pinsStanding) {
                 pin3.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin3.parent = pinB3;
             });
-    };
+    }
     if (pinsStanding[3]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -430,7 +458,7 @@ var setupPins = function(pinsStanding) {
                 pin4.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin4.parent = pinB4;
             });
-    };
+    }
     if (pinsStanding[4]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -443,7 +471,7 @@ var setupPins = function(pinsStanding) {
                 pin5.parent = pinB5;
 
             });
-    };
+    }
     if (pinsStanding[5]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -455,7 +483,7 @@ var setupPins = function(pinsStanding) {
                 pin6.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin6.parent = pinB6;
             });
-    };
+    }
     if (pinsStanding[6]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -467,7 +495,7 @@ var setupPins = function(pinsStanding) {
                 pin7.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin7.parent = pinB7;
             });
-    };
+    }
     if (pinsStanding[7]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -479,7 +507,7 @@ var setupPins = function(pinsStanding) {
                 pin8.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin8.parent = pinB8;
             });
-    };
+    }
     if (pinsStanding[8]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -491,7 +519,7 @@ var setupPins = function(pinsStanding) {
                 pin9.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin9.parent = pinB9;
             });
-    };
+    }
     if (pinsStanding[9]) {
         BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
             function(newMeshes) {
@@ -503,13 +531,12 @@ var setupPins = function(pinsStanding) {
                 pin10.scaling = new BABYLON.Vector3(5, 5, 5);
                 pin10.parent = pinB10;
             });
-    };
-    setup = true;
+    }
 };
 
 //Function to remove all pins for next bowl
 var cleanupPins = function() {
-    setup = false;
+    isSetup = false;
 
     pinB1.dispose();
     pin1.dispose();
@@ -573,24 +600,39 @@ var carMotion = function() {
     }
 };
 
+var updateGUI = function() {
+    if (topFrame) {
+        frameGUI.text = "Top " + frameNum;
+    } else {
+        frameGUI.text = "Bot " + frameNum;
+    }
+    scoreGUI.text = "Score: " + score;
+    speedGUI.text = "Speed: " + speed.toFixed(2);
+    score2GUI.text = "Last Bowl: " + oneThrowAgo;
+};
+
+var countStandingPins = function() {
+    var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
+    for (var i = 0; i < 10; i = i + 1) {
+        if (remainingPins[i]) {
+            if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
+                remainingPins[i] = false;
+                curRollCount += 1;
+            }
+        }
+    }
+};
+
 var addGameLogic = function() {
     addController();
 
-    /*********************************************************************************************************/
-    /************************************ BASIC GAME/FRAME IMPLEMENTATION*************************************/
-    /*********************************************************************************************************/
     gameScene.registerAfterRender(function() {
-        if (topFrame) {
-            frameGUI.text = "Top " + frameNum;
-        } else {
-            frameGUI.text = "Bot " + frameNum;
-        }
-        scoreGUI.text = "Score: " + score;
+        updateGUI();
 
-        if (!setup && (frameNum < 11 || extraFrame)) {
-            if (extraFrame) {
+        //setup pins for next throw if needed 
+        if (!isSetup && (frameNum < 11 || extraFrame)) {
+            if (extraFrame)
                 extraFrame = false;
-            };
             addCar();
             cam.position = new BABYLON.Vector3(0, 40, -250);
             cam.lockedTarget = carMesh.getAbsolutePosition();
@@ -598,9 +640,10 @@ var addGameLogic = function() {
                 setupPins(pinStanding);
             else
                 setupPins(remainingPins);
+            isSetup = true;
         }
 
-        if (carMesh.getAbsolutePosition().z > 25 && !overRamp && setup) {
+        if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
             overRamp = true;
             startTimer = new Date();
         };
@@ -610,16 +653,9 @@ var addGameLogic = function() {
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 10000) { //CALCULATE SCORE
-                var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
-                for (var i = 0; i < 10; i = i + 1) {
-                    if (remainingPins[i]) {
-                        if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
-                            remainingPins[i] = false;
-                            curRollCount += 1;
-                        }
-                    }
-                }
+            if ((endTimer - startTimer) >= 12000) {
+                //Count pins knocked over after 12 secs
+                countStandingPins();
 
                 /*********************************************************************************************************/
                 /**************************************** FRAME MANAGEMENT ***********************************************/
