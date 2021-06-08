@@ -53,6 +53,7 @@ var speed = 0;
 var accel = .4667;
 var decel = -.25;
 var MAXSPEED = 20;
+var carMoved = false;
 
 //physics info for pins and car
 var pinPHYSICS = { mass: 5, restitution: 0.0 };
@@ -392,7 +393,7 @@ var addCar = function() {
         });
 
     carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
-
+    carMoved = false;
 };
 
 //Function to remove car
@@ -577,6 +578,7 @@ var addController = function() {
 
 var addCarMechanics = function() {
     if (map["w"] || map["W"]) {
+        carMoved = true;
         speed += accel;
         if (speed > MAXSPEED)
             speed = MAXSPEED;
@@ -595,7 +597,7 @@ var addCarMechanics = function() {
             carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
     }
 
-    if ((speed + decel) > 0) {
+    if (((speed + decel) > 0) && carMoved) {
         speed += decel;
         var ImpulseVector = new BABYLON.Vector3(0, 0, decel);
         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
