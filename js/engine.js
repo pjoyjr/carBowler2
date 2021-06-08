@@ -28,7 +28,7 @@ var frameGUI, scoreGUI;
 var overRamp = false; //for checking to see if user can alter car
 var topFrame = true; //for checking first or second half of frame
 var setup = false; // for setting up pins
-var nextFrame = false;
+
 var extraFrame = false;
 var frameNum = 1;
 var startTimer, endTimer;
@@ -672,75 +672,28 @@ var addGameLogic = function() {
                 /*********************************************************************************************************/
                 /**************************************** FRAME MANAGEMENT ***********************************************/
                 /*********************************************************************************************************/
-                if (frameNum == 11) { //top of 11th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                };
-                if (!topFrame && frameNum == 10) { //bot of 10th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                    if ((twoThrowAgo + oneThrowAgo) == 10 || oneThrowAgo == 10) {
+                if (frameNum == 11 && !extraFrame) { //Game over
+                    pass
+                } else if (frameNum == 11 && extraFrame) { //Extra Frame earned
+                    pass
+                } else if (frameNum == 10) { //Check for extra Lane
+                    if ((twoThrowAgo + oneThrowAgo) == 10 || oneThrowAgo == 10) { //bot of 10th frame
                         extraFrame = true;
-                    };
-                };
-                if (topFrame && frameNum == 10) { //top of 10th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = false;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                    if (oneThrowAgo == 10) {
+                    }
+                    if (oneThrowAgo == 10) { //top of 10th frame
                         extraFrame = true;
-                    };
-                };
-                if (!topFrame && frameNum != 10) { //bot of frame
+                    }
+                } else {
                     rmCar();
                     cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
+                    topFrame = !topFrame;
+                    if (topFrame)
+                        frameNum = frameNum + 1;
                     threeThrowAgo = twoThrowAgo;
                     twoThrowAgo = oneThrowAgo;
                     oneThrowAgo = curRollCount;
                     curRollCount = 0;
-                    nextFrame = true;
-                };
-                if (topFrame && curRollCount < 10 && !nextFrame && frameNum != 10) { //top of frame and not a strike
-                    rmCar();
-                    cleanupPins();
-                    topFrame = false;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                };
-                if (topFrame && curRollCount == 10 && !nextFrame && frameNum != 10) { //top of a frame and a strike continue to next frame
-                    rmCar();
-                    cleanupPins();
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-
-                };
-                nextFrame = false;
-
-
-
+                }
                 /*********************************************************************************************************/
                 /**************************************** SCORE MANAGEMENT ***********************************************/
                 /*********************************************************************************************************/
