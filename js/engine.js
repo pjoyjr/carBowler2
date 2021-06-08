@@ -23,20 +23,24 @@ var carsArray = [pill, cube, cone];
 
 var car, carMesh;
 
+
 //game and score variables
 var frameGUI, scoreGUI;
 var overRamp = false; //for checking to see if user can alter car
 var topFrame = true; //for checking first or second half of frame
 var setup = false; // for setting up pins
-var nextFrame = false;
+var map = {}; //object for multiple key presses
+
 var extraFrame = false;
 var frameNum = 1;
 var startTimer, endTimer;
 var curRollCount = 0;
+var scoreboard = [];
 var score = 0;
 var oneThrowAgo = 0; //for spare calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0;
+
 
 //pin variables
 var remainingPins = [true, true, true, true, true, true, true, true, true, true];
@@ -237,8 +241,8 @@ var createGameGUI = function() {
     gameGUI.addControl(scoreGUI);
 };
 
+//Function to add all non moving objects to scene
 var addStationaryObjects = function() {
-    //Function to add all non moving objects to scene
 
     //scene and objects
     var skybox, skyboxMaterial, ground, groundMaterial, water, waterMesh;
@@ -364,7 +368,7 @@ var addCar = function() {
 
 };
 
-//Function to run all game logic
+//Function to remove car
 var rmCar = function() {
     carMesh.dispose();
     car.dispose(); //TODO ENABLE WITH BLENDERIMPORT
@@ -529,22 +533,48 @@ var cleanupPins = function() {
     pin10.dispose();
 };
 
-var addGameLogic = function() {
-
-    //object for multiple key presses
-    var map = {};
-
-    //SETUP UP ACTION MANAGER
+//Add action manager for input
+var addController = function() {
     gameScene.actionManager = new BABYLON.ActionManager(gameScene);
     gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
         function(evt) {
             map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
-
     gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
         function(evt) {
             map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
+};
+
+var carMotion = function() {
+    if (map["w"] || map["W"]) {
+        speed += accel;
+        if (speed > MAXSPEED)
+            speed = MAXSPEED;
+        if (speed < 0)
+            speed = 0;
+        var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
+    }
+    if (map["a"] || map["A"]) {
+        if (carMesh.getAbsolutePosition().x > -32)
+            carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+    };
+
+    if (map["d"] || map["D"]) {
+        if (carMesh.getAbsolutePosition().x < 32)
+            carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+    }
+
+    if ((speed + decel) > 0) {
+        speed += decel;
+        var ImpulseVector = new BABYLON.Vector3(0, 0, decel);
+        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
+    }
+};
+
+var addGameLogic = function() {
+    addController();
 
     /*********************************************************************************************************/
     /************************************ BASIC GAME/FRAME IMPLEMENTATION*************************************/
@@ -557,241 +587,116 @@ var addGameLogic = function() {
         }
         scoreGUI.text = "Score: " + score;
 
-        if (topFrame && !setup && (frameNum < 11 || extraFrame)) {
+        if (!setup && (frameNum < 11 || extraFrame)) {
             if (extraFrame) {
                 extraFrame = false;
             };
             addCar();
             cam.position = new BABYLON.Vector3(0, 40, -250);
             cam.lockedTarget = carMesh.getAbsolutePosition();
-            setupPins(pinStanding);
-        };
-        if (!topFrame && !setup && (frameNum < 11 || extraFrame)) {
-            if (extraFrame) {
-                extraFrame = false;
-            };
-            addCar();
-            cam.position = new BABYLON.Vector3(0, 40, -250);
-            cam.lockedTarget = carMesh.getAbsolutePosition();
-            setupPins(remainingPins);
-        };
+            if (topFrame)
+                setupPins(pinStanding);
+            else
+                setupPins(remainingPins);
+        }
+
         if (carMesh.getAbsolutePosition().z > 25 && !overRamp && setup) {
             overRamp = true;
             startTimer = new Date();
         };
         if (!overRamp) {
-            //input for motion
-            if (map["w"] || map["W"]) {
-                speed += accel;
-                if (speed > MAXSPEED) {
-                    speed = MAXSPEED;
-                };
-                if (speed < 0) {
-                    speed = 0;
-                };
-                var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
-                carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
-            };
-            if (map["a"] || map["A"]) {
-                if (carMesh.getAbsolutePosition().x > -32) {
-                    carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-                };
-            };
-
-            if (map["d"] || map["D"]) {
-                if (carMesh.getAbsolutePosition().x < 32) {
-                    carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
-                };
-            };
+            carMotion();
         } else { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
             if ((endTimer - startTimer) >= 10000) { //CALCULATE SCORE
-                if (remainingPins[0] == true) {
-                    //check if pinBx.getAbsolutePivotPoint().z is > 20 if so add to counter
-                    if (pinB1.getAbsolutePosition().y < 25.0 || pinB1.getAbsolutePosition().y > 27.0) {
-                        remainingPins[0] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[1] == true) {
-                    if (pinB2.getAbsolutePosition().y < 25.0 || pinB2.getAbsolutePosition().y > 27.0) {
-                        remainingPins[1] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[2] == true) {
-                    if (pinB3.getAbsolutePosition().y < 25.0 || pinB3.getAbsolutePosition().y > 27.0) {
-                        remainingPins[2] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[3] == true) {
-                    if (pinB4.getAbsolutePosition().y < 25.0 || pinB4.getAbsolutePosition().y > 27.0) {
-                        remainingPins[3] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[4] == true) {
-                    if (pinB5.getAbsolutePosition().y < 25.0 || pinB5.getAbsolutePosition().y > 27.0) {
-                        remainingPins[4] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[5] == true) {
-                    if (pinB6.getAbsolutePosition().y < 25.0 || pinB6.getAbsolutePosition().y > 27.0) {
-                        remainingPins[5] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[6] == true) {
-                    if (pinB7.getAbsolutePosition().y < 25.0 || pinB7.getAbsolutePosition().y > 27.0) {
-                        remainingPins[6] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[7] == true) {
-                    if (pinB8.getAbsolutePosition().y < 25.0 || pinB8.getAbsolutePosition().y > 27.0) {
-                        remainingPins[7] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[8] == true) {
-                    if (pinB9.getAbsolutePosition().y < 25.0 || pinB9.getAbsolutePosition().y > 27.0) {
-                        remainingPins[8] = false;
-                        curRollCount += 1;
-                    };
-                };
-                if (remainingPins[9] == true) {
-                    if (pinB10.getAbsolutePosition().y < 25.0 || pinB10.getAbsolutePosition().y > 27.0) {
-                        remainingPins[9] = false;
-                        curRollCount += 1;
-                    };
-                };
+                var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
+                for (var i = 0; i < 10; i = i + 1) {
+                    if (remainingPins[i]) {
+                        if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
+                            remainingPins[i] = false;
+                            curRollCount += 1;
+                        }
+                    }
+                }
 
-                //changing states
-                if (frameNum == 11) { //top of 11th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                };
-                if (!topFrame && frameNum == 10) { //bot of 10th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                    if ((twoThrowAgo + oneThrowAgo) == 10 || oneThrowAgo == 10) {
+                /*********************************************************************************************************/
+                /**************************************** FRAME MANAGEMENT ***********************************************/
+                /*********************************************************************************************************/
+                if (frameNum == 11 && !extraFrame) { //Game over
+                    pass
+                } else if (frameNum == 11 && extraFrame) { //Extra Frame earned
+                    pass
+                } else if (frameNum == 10) { //Check for extra Lane
+                    if ((twoThrowAgo + oneThrowAgo) == 10 || oneThrowAgo == 10) { //bot of 10th frame
                         extraFrame = true;
-                    };
-                };
-                if (topFrame && frameNum == 10) { //top of 10th frame
-                    rmCar();
-                    cleanupPins();
-                    topFrame = false;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                    if (oneThrowAgo == 10) {
+                    }
+                    if (oneThrowAgo == 10) { //top of 10th frame
                         extraFrame = true;
-                    };
-                };
-                if (!topFrame && frameNum != 10) { //bot of frame
+                    }
+                } else {
                     rmCar();
                     cleanupPins();
-                    topFrame = true;
-                    frameNum += 1;
+                    topFrame = !topFrame;
                     threeThrowAgo = twoThrowAgo;
                     twoThrowAgo = oneThrowAgo;
                     oneThrowAgo = curRollCount;
+                    scoreboard.push(curRollCount);
                     curRollCount = 0;
-                    nextFrame = true;
-                };
-                if (topFrame && curRollCount < 10 && !nextFrame && frameNum != 10) { //top of frame and not a strike
-                    rmCar();
-                    cleanupPins();
-                    topFrame = false;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-                };
-                if (topFrame && curRollCount == 10 && !nextFrame && frameNum != 10) { //top of a frame and a strike continue to next frame
-                    rmCar();
-                    cleanupPins();
-                    frameNum += 1;
-                    threeThrowAgo = twoThrowAgo;
-                    twoThrowAgo = oneThrowAgo;
-                    oneThrowAgo = curRollCount;
-                    curRollCount = 0;
-
-                };
-                nextFrame = false;
-
-                //calculate score
+                }
+                frameNum = Math.floor(scoreboard.length / 2) + 1;
+                /*********************************************************************************************************/
+                /**************************************** SCORE MANAGEMENT ***********************************************/
+                /*********************************************************************************************************/
                 if (threeThrowAgo == 10 && frameNum != 12) { //threw a strike three throws ago so calulate
                     score += 10 + twoThrowAgo + oneThrowAgo;
-                };
+                }
                 if ((threeThrowAgo + twoThrowAgo) == 10 && threeThrowAgo != 10 && twoThrowAgo != 10 && !topFrame) { //threw a spare so calculate
                     score += 10 + oneThrowAgo;
-                };
+                }
                 if (topFrame && frameNum < 11) {
                     remainingPins = [true, true, true, true, true, true, true, true, true, true];
                     if ((twoThrowAgo + oneThrowAgo) != 10 && oneThrowAgo != 10) { //no strike on last throw and didnt just pick up spare
                         score += twoThrowAgo + oneThrowAgo;
-                    };
-                };
+                    }
+                }
                 if (topFrame && frameNum == 11) { //score of 10th frame
                     if ((twoThrowAgo + oneThrowAgo) == 10 && oneThrowAgo != 10) { //no strike on last throw but pick up spare
                         score += 10 + twoThrowAgo + oneThrowAgo;
-                    };
+                    }
                     if (oneThrowAgo == 10) {
                         score += 10 + oneThrowAgo
-                    };
-                };
+                    }
+                }
                 if (topFrame && frameNum == 12) { // if got the extra frame
                     if ((threeThrowAgo + twoThrowAgo + oneThrowAgo) == 30) {
                         score += 30;
                         threeThrowAgo = 0;
                         twoThrowAgo = 0;
                         oneThrowAgo = 0;
-                    };
+                    }
                     if (threeThrowAgo == 10) {
                         score += 10 + twoThrowAgo + oneThrowAgo;
                         threeThrowAgo = 0;
                         twoThrowAgo = 0;
                         oneThrowAgo = 0;
-                    };
+                    }
                     if (twoThrowAgo == 10) {
                         score += twoThrowAgo + oneThrowAgo;
                         threeThrowAgo = 0;
                         twoThrowAgo = 0;
                         oneThrowAgo = 0;
-                    };
+                    }
                     if (oneThrowAgo > 0) {
                         score += oneThrowAgo;
                         threeThrowAgo = 0;
                         twoThrowAgo = 0;
                         oneThrowAgo = 0;
-                    };
-                };
-            };
-        };
-        if ((speed + decel) > 0) {
-            speed += decel;
-            var ImpulseVector = new BABYLON.Vector3(0, 0, decel);
-            carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
-        };
+                    }
+                }
+            }
+        }
     });
 };
 
