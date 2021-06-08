@@ -530,9 +530,7 @@ var cleanupPins = function() {
 };
 
 var addGameLogic = function() {
-
-    //object for multiple key presses
-    var map = {};
+    var map = {}; //object for multiple key presses
 
     //SETUP UP ACTION MANAGER
     gameScene.actionManager = new BABYLON.ActionManager(gameScene);
@@ -540,16 +538,13 @@ var addGameLogic = function() {
         function(evt) {
             map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
-
     gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
         function(evt) {
             map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
 
-    /*********************************************************************************************************/
-    /************************************ BASIC GAME/FRAME IMPLEMENTATION*************************************/
-    /*********************************************************************************************************/
     gameScene.registerAfterRender(function() {
+        //GUI IMPLEMENTATION
         if (topFrame) {
             frameGUI.text = "Top " + frameNum;
         } else {
@@ -557,6 +552,9 @@ var addGameLogic = function() {
         }
         scoreGUI.text = "Score: " + score;
 
+        /*********************************************************************************************************/
+        /**************************************** GAME IMPLEMENTATION ********************************************/
+        /*********************************************************************************************************/
         if (topFrame && !setup && (frameNum < 11 || extraFrame)) {
             if (extraFrame) {
                 extraFrame = false;
@@ -607,7 +605,7 @@ var addGameLogic = function() {
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 10000) { //CALCULATE SCORE
+            if ((endTimer - startTimer) >= 12000) {
                 if (remainingPins[0] == true) {
                     //check if pinBx.getAbsolutePivotPoint().z is > 20 if so add to counter
                     if (pinB1.getAbsolutePosition().y < 25.0 || pinB1.getAbsolutePosition().y > 27.0) {
@@ -670,7 +668,10 @@ var addGameLogic = function() {
                     };
                 };
 
-                //changing states
+
+                /*********************************************************************************************************/
+                /**************************************** FRAME MANAGEMENT ***********************************************/
+                /*********************************************************************************************************/
                 if (frameNum == 11) { //top of 11th frame
                     rmCar();
                     cleanupPins();
@@ -738,7 +739,11 @@ var addGameLogic = function() {
                 };
                 nextFrame = false;
 
-                //calculate score
+
+
+                /*********************************************************************************************************/
+                /**************************************** SCORE MANAGEMENT ***********************************************/
+                /*********************************************************************************************************/
                 if (threeThrowAgo == 10 && frameNum != 12) { //threw a strike three throws ago so calulate
                     score += 10 + twoThrowAgo + oneThrowAgo;
                 };
