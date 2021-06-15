@@ -37,7 +37,7 @@ var startTimer, endTimer;
 var curRollCount = 0;
 var scoreboard = [];
 var score = 0;
-var oneThrowAgo = 0; //for spare calculation
+var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0;
 
@@ -52,11 +52,11 @@ var pinMesh, pinMeshAlpha = 0;
 var speed = 0;
 var accel = .4667;
 var decel = -.25;
-var MAXSPEED = 20;
+var MAXSPEED = 10;
 var carMoved = false;
 
 //physics info for pins and car
-var pinPHYSICS = { mass: 5, restitution: 0.0 };
+var pinPHYSICS = { mass: 3, restitution: 0.0 };
 var carPHYSICS = { mass: 10, restitution: 0.0 };
 
 var degToRadians = function(degrees) {
@@ -416,7 +416,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB1 = BABYLON.MeshBuilder.CreateCylinder("pinB1", pinDIM, gameScene);
-                            pinB1.position = new BABYLON.Vector3(0, 42, 148);
+                            pinB1.position = new BABYLON.Vector3(0, 38, 148);
                             pinB1.material = pinMesh;
                             pinB1.physicsImpostor = new BABYLON.PhysicsImpostor(pinB1, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin1 = newMeshes[0];
@@ -428,7 +428,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB2 = BABYLON.MeshBuilder.CreateCylinder("pinB2", pinDIM, gameScene);
-                            pinB2.position = new BABYLON.Vector3(-7.5, 42, 163);
+                            pinB2.position = new BABYLON.Vector3(-7.5, 38, 163);
                             pinB2.material = pinMesh;
                             pinB2.physicsImpostor = new BABYLON.PhysicsImpostor(pinB2, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin2 = newMeshes[0];
@@ -440,7 +440,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB3 = BABYLON.MeshBuilder.CreateCylinder("pinB3", pinDIM, gameScene);
-                            pinB3.position = new BABYLON.Vector3(7.5, 42, 163);
+                            pinB3.position = new BABYLON.Vector3(7.5, 38, 163);
                             pinB3.material = pinMesh;
                             pinB3.physicsImpostor = new BABYLON.PhysicsImpostor(pinB3, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin3 = newMeshes[0];
@@ -452,7 +452,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB4 = BABYLON.MeshBuilder.CreateCylinder("pinB4", pinDIM, gameScene);
-                            pinB4.position = new BABYLON.Vector3(-15, 42, 178);
+                            pinB4.position = new BABYLON.Vector3(-15, 38, 178);
                             pinB4.material = pinMesh;
                             pinB4.physicsImpostor = new BABYLON.PhysicsImpostor(pinB4, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin4 = newMeshes[0];
@@ -464,7 +464,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB5 = BABYLON.MeshBuilder.CreateCylinder("pinB5", pinDIM, gameScene);
-                            pinB5.position = new BABYLON.Vector3(0, 42, 178);
+                            pinB5.position = new BABYLON.Vector3(0, 38, 178);
                             pinB5.material = pinMesh;
                             pinB5.physicsImpostor = new BABYLON.PhysicsImpostor(pinB5, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin5 = newMeshes[0];
@@ -476,7 +476,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB6 = BABYLON.MeshBuilder.CreateCylinder("pinB6", pinDIM, gameScene);
-                            pinB6.position = new BABYLON.Vector3(15, 42, 178);
+                            pinB6.position = new BABYLON.Vector3(15, 38, 178);
                             pinB6.material = pinMesh;
                             pinB6.physicsImpostor = new BABYLON.PhysicsImpostor(pinB6, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin6 = newMeshes[0];
@@ -488,7 +488,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB7 = BABYLON.MeshBuilder.CreateCylinder("pinB7", pinDIM, gameScene);
-                            pinB7.position = new BABYLON.Vector3(-22.5, 42, 193);
+                            pinB7.position = new BABYLON.Vector3(-22.5, 38, 193);
                             pinB7.material = pinMesh;
                             pinB7.physicsImpostor = new BABYLON.PhysicsImpostor(pinB7, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin7 = newMeshes[0];
@@ -500,7 +500,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB8 = BABYLON.MeshBuilder.CreateCylinder("pinB8", pinDIM, gameScene);
-                            pinB8.position = new BABYLON.Vector3(-7.5, 42, 193);
+                            pinB8.position = new BABYLON.Vector3(-7.5, 38, 193);
                             pinB8.material = pinMesh;
                             pinB8.physicsImpostor = new BABYLON.PhysicsImpostor(pinB8, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin8 = newMeshes[0];
@@ -512,7 +512,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB9 = BABYLON.MeshBuilder.CreateCylinder("pinB9", pinDIM, gameScene);
-                            pinB9.position = new BABYLON.Vector3(7.5, 42, 193);
+                            pinB9.position = new BABYLON.Vector3(7.5, 38, 193);
                             pinB9.material = pinMesh;
                             pinB9.physicsImpostor = new BABYLON.PhysicsImpostor(pinB9, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin9 = newMeshes[0];
@@ -524,7 +524,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB10 = BABYLON.MeshBuilder.CreateCylinder("pinB10", pinDIM, gameScene);
-                            pinB10.position = new BABYLON.Vector3(22.5, 42, 193);
+                            pinB10.position = new BABYLON.Vector3(22.5, 38, 193);
                             pinB10.material = pinMesh;
                             pinB10.physicsImpostor = new BABYLON.PhysicsImpostor(pinB10, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin10 = newMeshes[0];
@@ -586,22 +586,21 @@ var addCarMechanics = function() {
             speed = 0;
         var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
+    } else if (((speed + decel) > 0) && carMoved) {
+        speed += decel;
+        var ImpulseVector = new BABYLON.Vector3(0, 0, decel);
+        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
     }
     if (map["a"] || map["A"]) {
         if (carMesh.getAbsolutePosition().x > -32)
             carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-    };
+    }
 
     if (map["d"] || map["D"]) {
         if (carMesh.getAbsolutePosition().x < 32)
             carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
     }
 
-    if (((speed + decel) > 0) && carMoved) {
-        speed += decel;
-        var ImpulseVector = new BABYLON.Vector3(0, 0, decel);
-        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
-    }
 };
 
 var updateGUI = function() {
@@ -627,52 +626,71 @@ var countStandingPins = function() {
     }
 };
 
-var calculateScore = function() {
-    if (threeThrowAgo == 10 && frameNum != 12) { //threw a strike three throws ago so calulate
-        score += 10 + twoThrowAgo + oneThrowAgo;
+var manageFrames = function() {
+    if (frameNum < 10) {
+        if (topFrame && curRollCount == 10) { //strike on top of frame
+            scoreboard.push(curRollCount);
+            scoreboard.push(0);
+        } else {
+            scoreboard.push(curRollCount);
+        }
+    } else if (frameNum == 10) {
+        if (topFrame) { //top of 10th frame
+            if (curRollCount == 10) {
+                extraFrame = true;
+                scoreboard.push(curRollCount);
+            }
+        } else { //bottom of 10th frame
+            if (curRollCount == 10) {
+                extraFrame = true;
+                scoreboard.push(curRollCount);
+            } else if ((curRollCount + oneThrowAgo) == 10) {
+                extraFrame = true;
+                scoreboard.push(curRollCount);
+            }
+        }
+    } else if (frameNum == 11 && topFrame && extraFrame) {
+        scoreboard.push(curRollCount);
     }
-    if ((threeThrowAgo + twoThrowAgo) == 10 && threeThrowAgo != 10 && twoThrowAgo != 10 && !topFrame) { //threw a spare so calculate
-        score += 10 + oneThrowAgo;
-    }
-    if (topFrame && frameNum < 11) {
+
+    threeThrowAgo = twoThrowAgo;
+    twoThrowAgo = oneThrowAgo;
+    oneThrowAgo = curRollCount;
+    curRollCount = 0;
+
+    frameNum = Math.floor(scoreboard.length / 2) + 1;
+    if (scoreboard.length % 2 == 0)
+        topFrame = true;
+    else
+        topFrame = false;
+
+    if (topFrame && frameNum < 12)
         remainingPins = [true, true, true, true, true, true, true, true, true, true];
-        if ((twoThrowAgo + oneThrowAgo) != 10 && oneThrowAgo != 10) { //no strike on last throw and didnt just pick up spare
-            score += twoThrowAgo + oneThrowAgo;
-        }
-    }
-    if (topFrame && frameNum == 11) { //score of 10th frame
-        if ((twoThrowAgo + oneThrowAgo) == 10 && oneThrowAgo != 10) { //no strike on last throw but pick up spare
+};
+
+var calculateScore = function() {
+    if (threeThrowAgo == 10 && frameNum < 12) //threw a strike three throws ago so calulate
+        score += 10 + twoThrowAgo + oneThrowAgo;
+    if (topFrame && frameNum < 10) { //threw a spare so calculate
+        if ((oneThrowAgo + twoThrowAgo != 10) && oneThrowAgo != 10)
+            score += oneThrowAgo + twoThrowAgo;
+    } else if (!topFrame && frameNum < 10) {
+        if ((threeThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10)
+            score += 10 + oneThrowAgo;
+    } else if (frameNum == 10) { //score of 10th frame
+        if ((twoThrowAgo + oneThrowAgo) == 10 && oneThrowAgo != 10) //no strike on last throw but pick up spare
             score += 10 + twoThrowAgo + oneThrowAgo;
-        }
-        if (oneThrowAgo == 10) {
+        if (oneThrowAgo == 10)
             score += 10 + oneThrowAgo
-        }
-    }
-    if (topFrame && frameNum == 12) { // if got the extra frame
-        if ((threeThrowAgo + twoThrowAgo + oneThrowAgo) == 30) {
+    } else if (topFrame && frameNum == 11 && extraFrame) { // if got the extra frame
+        if ((threeThrowAgo + twoThrowAgo + oneThrowAgo) == 30)
             score += 30;
-            threeThrowAgo = 0;
-            twoThrowAgo = 0;
-            oneThrowAgo = 0;
-        }
-        if (threeThrowAgo == 10) {
+        if (threeThrowAgo == 10)
             score += 10 + twoThrowAgo + oneThrowAgo;
-            threeThrowAgo = 0;
-            twoThrowAgo = 0;
-            oneThrowAgo = 0;
-        }
-        if (twoThrowAgo == 10) {
+        if (twoThrowAgo == 10)
             score += twoThrowAgo + oneThrowAgo;
-            threeThrowAgo = 0;
-            twoThrowAgo = 0;
-            oneThrowAgo = 0;
-        }
-        if (oneThrowAgo > 0) {
+        if (oneThrowAgo > 0)
             score += oneThrowAgo;
-            threeThrowAgo = 0;
-            twoThrowAgo = 0;
-            oneThrowAgo = 0;
-        }
     }
 };
 
@@ -695,12 +713,6 @@ var cleanupFrame = function() {
     countStandingPins();
     rmCar();
     cleanupPins();
-    topFrame = !topFrame;
-    threeThrowAgo = twoThrowAgo;
-    twoThrowAgo = oneThrowAgo;
-    oneThrowAgo = curRollCount;
-    scoreboard.push(curRollCount);
-    curRollCount = 0;
 };
 
 var addGameLogic = function() {
@@ -725,22 +737,8 @@ var addGameLogic = function() {
             endTimer = new Date();
             if ((endTimer - startTimer) >= 12000) {
                 //Count pins knocked over after 12 secs
-
-                if (frameNum == 11 && !extraFrame) { //Game over
-                    pass
-                } else if (frameNum == 11 && extraFrame) { //Extra Frame earned
-                    pass
-                } else if (frameNum == 10) { //Check for extra Lane
-                    if ((twoThrowAgo + oneThrowAgo) == 10 || oneThrowAgo == 10) { //bot of 10th frame
-                        extraFrame = true;
-                    }
-                    if (oneThrowAgo == 10) { //top of 10th frame
-                        extraFrame = true;
-                    }
-                }
-
                 cleanupFrame();
-                frameNum = Math.floor(scoreboard.length / 2) + 1;
+                manageFrames();
                 calculateScore();
             }
         }

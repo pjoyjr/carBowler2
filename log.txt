@@ -5,6 +5,10 @@ TODO:
 Fix End Game
 Fix car mechanics
 
+POSSIBLE CHANGES:
+change 12 sec wait on pins failing to no movement from pins
+move pin island up for better view of remaining pins
+
 
 FUTURE ADDONS:
 Multiple cars when certain scores achieved
