@@ -35,22 +35,22 @@ var gameOver = false;
 var extraFrame = false;
 var startTimer, endTimer;
 var curRollCount = 0;
+//*
+var frameNum = 9;
+var scorecard = ["-", "X", 9, "/", "0", "0", 2, 4, 3, 3, 6, "/", 9, "/", "0", "0"];
+var score = 71;
+var oneThrowAgo = [0, 15]; //for spare/strike calculation
+var twoThrowAgo = [0, 14]; //for spare/strike calculation
+var threeThrowAgo = [1, 13]; //for spare/strike calculation
+//*/
 /*
-var frameNum = 10;
-var scoreboard = [10, 0, 7, 2, 5, 4, 8, 2, 4, 4, 8, 2, 4, 4, 7, 0, 10, 0];
-var score = 88;
-var oneThrowAgo = 10; //for spare/strike calculation
-var twoThrowAgo = 0; //for spare/strike calculation
-var threeThrowAgo = 7; //for spare/strike calculation
-*/
-
 var frameNum = 1;
-var scoreboard = [];
+var scorecard = [];
 var score = 0;
 var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0; //for spare/strike calculation
-
+*/
 
 //pin variables
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
@@ -637,81 +637,72 @@ var countStandingPins = function() {
 };
 
 var manageFrames = function() {
-    if (frameNum < 10) {
-        if (topFrame && curRollCount == 10) { //strike on top of frame
-            scoreboard.push("-");
-            scoreboard.push("X");
-        } else if (!topFrame && (curRollCount + oneThrowAgo == 10)) {
-            scoreboard.push("/");
+    if (topFrame && curRollCount == 10 && frameNum < 10) { //strike on top of frame
+        scorecard.push("-");
+        scorecard.push("X");
+    } else if (!topFrame && (curRollCount + oneThrowAgo[0] == 10) && frameNum < 10) {
+        scorecard.push("/");
+    } else if (frameNum < 10) {
+        scorecard.push(curRollCount);
+    } else if (scorecard.length == 18) {
+        if (curRollCount == 10) {
+            extraFrame = true;
+            scorecard.push("X");
         } else {
-            if (curRollCount == 0)
-                scoreboard.push("-");
-            else
-                scoreboard.push(curRollCount);
+            scorecard.push(curRollCount);
         }
-    } else if (frameNum == 10 || frameNum == 11) {
-        if (topFrame) { //top of 10th frame
-            if (curRollCount == 10) {
-                extraFrame = true;
-                scoreboard.push("X");
-            } else {
-                if (curRollCount == 0)
-                    scoreboard.push("-");
-                else
-                    scoreboard.push(curRollCount);
-            }
-        } else if (!topFrame || frameNum == 11) { //bottom of 10th frame
-            if (curRollCount == 10 && oneThrowAgo == 10) {
-                scoreboard.push("X");
-                extraFrame = true;
-            } else if ((curRollCount + oneThrowAgo) == 10) {
-                scoreboard.push("/");
-                extraFrame = true;
-            } else {
-                if (curRollCount == 0)
-                    scoreboard.push("-");
-                else
-                    scoreboard.push(curRollCount);
-            }
+    } else if (scorecard.length == 19) { //bottom of 10th frame
+        if (curRollCount == 10 && oneThrowAgo[0] == 10) {
+            scorecard.push("X");
+            extraFrame = true;
+        } else if ((curRollCount + oneThrowAgo[0]) == 10) {
+            scorecard.push("/");
+            extraFrame = true;
+        } else {
+            scorecard.push(curRollCount);
         }
+    } else if (scorecard.length == 20) {
+        if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && curRollCount == 10) {
+            scorecard.push("X");
+            extraFrame = true;
+        } else if ((curRollCount + oneThrowAgo[0]) == 10) {
+            scorecard.push("/");
+            extraFrame = true;
+        } else {
+            scorecard.push(curRollCount);
+        }
+
     }
 
     threeThrowAgo = twoThrowAgo;
     twoThrowAgo = oneThrowAgo;
-    oneThrowAgo = curRollCount;
+    oneThrowAgo = [curRollCount, (scorecard.length - 1)]; //[count, index]
     curRollCount = 0;
 
-    frameNum = Math.floor(scoreboard.length / 2) + 1;
-    if (scoreboard.length % 2 == 0)
+    frameNum = Math.floor(scorecard.length / 2) + 1;
+    if (scorecard.length % 2 == 0)
         topFrame = true;
     else
         topFrame = false;
-
-    if (topFrame && frameNum < 11)
-        pinStanding = [true, true, true, true, true, true, true, true, true, true];
-    //extra frame earned on first throw of 10th
-    else if (frameNum == 10 && !topFrame && extraFrame)
-        pinStanding = [true, true, true, true, true, true, true, true, true, true];
-    //extra frame earned on 2nd throw of 10th
-    else if (frameNum == 11 && topFrame && ((oneThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10))
+    if (topFrame || scorecard[18] == "X")
         pinStanding = [true, true, true, true, true, true, true, true, true, true];
 };
 
 var checkStrike = function() {
-    if (threeThrowAgo == 10)
-        score += 10 + twoThrowAgo + oneThrowAgo;
+    if (scorecard[threeThrowAgo[1]] == "X")
+        score += 10 + twoThrowAgo[0] + oneThrowAgo[0];
 };
 
 var checkSpare = function() {
-    if ((threeThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10)
-        score += 10 + oneThrowAgo;
+    if (scorecard[twoThrowAgo[1]] == "/")
+        score += 10 + oneThrowAgo[0];
 };
 
 var calculateScore = function() {
     checkStrike();
-    if (topFrame && frameNum < 11 && !extraFrame) {
-        if ((oneThrowAgo + twoThrowAgo != 10) && oneThrowAgo != 10) { // no strike or spare
-            score += oneThrowAgo + twoThrowAgo;
+    if (topFrame && frameNum < 12 && !extraFrame) {
+        if ((oneThrowAgo[0] + twoThrowAgo[0] != 10) && oneThrowAgo[0] != 10) { // no spare and no strike
+            score += oneThrowAgo[0] + twoThrowAgo[0];
         }
     } else if (!topFrame) {
         checkSpare();
@@ -732,18 +723,21 @@ var cleanupFrame = function() {
     cleanupPins();
 };
 
+var endGame = function() {
+  //DISPLAY SCORE AND RETURN TO MAIN MENU AFTER CONFIRMING  
+};
+
 var addGameLogic = function() {
     addController();
 
     gameScene.registerAfterRender(function() {
         updateGUI();
 
-        //setup pins for next throw if needed 
-        if (!isSetup && (frameNum < 11 || extraFrame))
-            setupForThrow();
-        else {
+        if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
             gameOver = true;
-        }
+
+        if (!isSetup && !gameOver)
+            setupForThrow();
 
         if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
             overRamp = true;
@@ -751,7 +745,7 @@ var addGameLogic = function() {
         }
         if (!overRamp) {
             addCarMechanics();
-        } else { // wait till timer is done then count pins
+        } else if (!gameOver) { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
@@ -761,6 +755,8 @@ var addGameLogic = function() {
                 manageFrames();
                 calculateScore();
             }
+        } else if (gameOver) {
+            endGame();
         }
     });
 };
