@@ -35,22 +35,22 @@ var gameOver = false;
 var extraFrame = false;
 var startTimer, endTimer;
 var curRollCount = 0;
-//*
+/*
 var frameNum = 10;
 var scoreboard = [10, 0, 7, 2, 5, 4, 8, 2, 4, 4, 8, 2, 4, 4, 7, 0, 10, 0];
 var score = 88;
 var oneThrowAgo = 10; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 7; //for spare/strike calculation
-//*/
-/*
+*/
+
 var frameNum = 1;
 var scoreboard = [];
 var score = 0;
 var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0; //for spare/strike calculation
-*/
+
 
 //pin variables
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
@@ -639,23 +639,41 @@ var countStandingPins = function() {
 var manageFrames = function() {
     if (frameNum < 10) {
         if (topFrame && curRollCount == 10) { //strike on top of frame
-            scoreboard.push(curRollCount);
-            scoreboard.push(0);
+            scoreboard.push("-");
+            scoreboard.push("X");
+        } else if (!topFrame && (curRollCount + oneThrowAgo == 10)) {
+            scoreboard.push("/");
         } else {
-            scoreboard.push(curRollCount);
+            if (curRollCount == 0)
+                scoreboard.push("-");
+            else
+                scoreboard.push(curRollCount);
         }
-    } else if (frameNum == 10) {
+    } else if (frameNum == 10 || frameNum == 11) {
         if (topFrame) { //top of 10th frame
-            if (curRollCount == 10)
+            if (curRollCount == 10) {
                 extraFrame = true;
-            scoreboard.push(curRollCount);
-        } else { //bottom of 10th frame
-            if (curRollCount == 10 || ((curRollCount + oneThrowAgo) == 10))
+                scoreboard.push("X");
+            } else {
+                if (curRollCount == 0)
+                    scoreboard.push("-");
+                else
+                    scoreboard.push(curRollCount);
+            }
+        } else if (!topFrame || frameNum == 11) { //bottom of 10th frame
+            if (curRollCount == 10 && oneThrowAgo == 10) {
+                scoreboard.push("X");
                 extraFrame = true;
-            scoreboard.push(curRollCount);
+            } else if ((curRollCount + oneThrowAgo) == 10) {
+                scoreboard.push("/");
+                extraFrame = true;
+            } else {
+                if (curRollCount == 0)
+                    scoreboard.push("-");
+                else
+                    scoreboard.push(curRollCount);
+            }
         }
-    } else if (frameNum == 11 && topFrame && extraFrame) {
-        scoreboard.push(curRollCount);
     }
 
     threeThrowAgo = twoThrowAgo;
@@ -685,7 +703,7 @@ var checkStrike = function() {
 };
 
 var checkSpare = function() {
-    if ((threeThrowAgo + twoThrowAgo == 10) && threeThrowAgo != 10)
+    if ((threeThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10)
         score += 10 + oneThrowAgo;
 };
 
