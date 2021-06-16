@@ -25,9 +25,9 @@ var car, carMesh;
 
 
 //game and score variables
+var gameGUI;
 var frameGUI, scoreGUI, speedGUI, score2GUI;
 var overRamp = false; //for checking to see if user can alter car
-var topFrame = true; //for checking first or second half of frame
 var isSetup = false; // for setting up pins
 var map = {}; //object for multiple key presses
 
@@ -35,15 +35,9 @@ var gameOver = false;
 var extraFrame = false;
 var startTimer, endTimer;
 var curRollCount = 0;
-//*
-var frameNum = 9;
-var scorecard = ["-", "X", 9, "/", "0", "0", 2, 4, 3, 3, 6, "/", 9, "/", "0", "0"];
-var score = 71;
-var oneThrowAgo = [0, 15]; //for spare/strike calculation
-var twoThrowAgo = [0, 14]; //for spare/strike calculation
-var threeThrowAgo = [1, 13]; //for spare/strike calculation
-//*/
+
 /*
+var topFrame = true;
 var frameNum = 1;
 var scorecard = [];
 var score = 0;
@@ -51,6 +45,17 @@ var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0; //for spare/strike calculation
 */
+
+var testingBOOL = false;
+
+var firstTime = true;
+var frameNum = 10;
+var topFrame = false;
+var scorecard = ["-", "X", 9, "/", "0", "0", 2, 4, 3, 3, 6, "/", 9, "/", "0", "0", "-", "X", 0];
+var score = 71;
+var oneThrowAgo = [0, 18]; //for spare/strike calculation
+var twoThrowAgo = [10, 17]; //for spare/strike calculation
+var threeThrowAgo = [0, 15]; //for spare/strike calculation
 
 //pin variables
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
@@ -111,15 +116,6 @@ var formatBtn = function(button) {
     button.background = "blue";
     button.fontSize = "50px";
     button.children[0].color = "white";
-};
-
-var formatTextGUI = function(textGUI) {
-    textGUI.width = "35%";
-    textGUI.height = "10%";
-    textGUI.color = "white";
-    textGUI.cornerRadius = 20;
-    textGUI.background = "green";
-    textGUI.fontSize = 24;
 };
 
 var createMainMenuScene = function() {
@@ -214,65 +210,46 @@ var createCarSelectScene = function() {
 };
 
 var createGameGUI = function() {
-    var gameGUI, scoreOUTLINE, frameOUTLINE, speedOUTLINE, score2OUTLINE;
-
     gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
 
-    frameGUI = new BABYLON.GUI.TextBlock();
-    scoreGUI = new BABYLON.GUI.TextBlock();
-    speedGUI = new BABYLON.GUI.TextBlock(); //maybe for testing only
-    score2GUI = new BABYLON.GUI.TextBlock(); //maybe for testing only
+    scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("scoreGUI", "");
+    frameGUI = BABYLON.GUI.Button.CreateSimpleButton("frameGUI", "");
+    speedGUI = BABYLON.GUI.Button.CreateSimpleButton("speedGUI", "");
+    score2GUI = BABYLON.GUI.Button.CreateSimpleButton("score2GUI", "");
 
-    scoreOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", ""); //Morph into textblock?
-    frameOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("fOUTLINE", ""); //Morph into textblock?
-    speedOUTLINE = BABYLON.GUI.Button.CreateSimpleButton("speedOUTLINE", ""); //maybe for testing only
-    score2OUTLINE = BABYLON.GUI.Button.CreateSimpleButton("score2OUTLINE", ""); //maybe for testing only
+    formatBtn(scoreGUI);
+    formatBtn(frameGUI);
+    formatBtn(speedGUI);
+    formatBtn(score2GUI);
 
-    formatTextGUI(frameGUI);
-    formatTextGUI(scoreGUI);
-    formatTextGUI(speedGUI);
-    formatTextGUI(score2GUI);
-    formatBtn(scoreOUTLINE);
-    formatBtn(frameOUTLINE);
-    formatBtn(speedOUTLINE);
-    formatBtn(score2OUTLINE);
-    frameGUI.text = "Frame:";
+    frameGUI.textBlock.text = "Frame:";
     frameGUI.top = "-45%";
     frameGUI.left = "40%";
-    scoreGUI.text = "Score:";
+    frameGUI.height = "5%";
+    frameGUI.width = "20%";
+    frameGUI.textBlock.fontSize = 24;
+
+    scoreGUI.textBlock.text = "Score:";
     scoreGUI.top = "-40%";
     scoreGUI.left = "40%";
+    scoreGUI.height = "5%";
+    scoreGUI.width = "20%";
+    scoreGUI.textBlock.fontSize = 24;
 
-    speedGUI.text = "Speed:";
+    speedGUI.textBlock.text = "Speed:";
     speedGUI.top = "-35%";
     speedGUI.left = "40%";
-    score2GUI.text = "Last Bowl:";
+    speedGUI.height = "5%";
+    speedGUI.width = "20%";
+    speedGUI.textBlock.fontSize = 24;
+
+    score2GUI.textBlock.text = "Last Bowl:";
     score2GUI.top = "-30%";
     score2GUI.left = "40%";
+    score2GUI.height = "5%";
+    score2GUI.width = "20%";
+    score2GUI.textBlock.fontSize = 24;
 
-
-    frameOUTLINE.top = "-45%";
-    frameOUTLINE.left = "40%";
-    frameOUTLINE.height = "5%";
-    frameOUTLINE.width = "20%";
-    scoreOUTLINE.top = "-40%";
-    scoreOUTLINE.left = "40%";
-    scoreOUTLINE.height = "5%";
-    scoreOUTLINE.width = "20%";
-
-    speedOUTLINE.top = "-35%";
-    speedOUTLINE.left = "40%";
-    speedOUTLINE.height = "5%";
-    speedOUTLINE.width = "20%";
-    score2OUTLINE.top = "-30%";
-    score2OUTLINE.left = "40%";
-    score2OUTLINE.height = "5%";
-    score2OUTLINE.width = "20%";
-
-    gameGUI.addControl(scoreOUTLINE);
-    gameGUI.addControl(frameOUTLINE);
-    gameGUI.addControl(speedOUTLINE);
-    gameGUI.addControl(score2OUTLINE);
     gameGUI.addControl(frameGUI);
     gameGUI.addControl(scoreGUI);
     gameGUI.addControl(speedGUI);
@@ -615,13 +592,13 @@ var addCarMechanics = function() {
 
 var updateGUI = function() {
     if (topFrame) {
-        frameGUI.text = "Top " + frameNum;
+        frameGUI.textBlock.text = "Top " + frameNum;
     } else {
-        frameGUI.text = "Bot " + frameNum;
+        frameGUI.textBlock.text = "Bot " + frameNum;
     }
-    scoreGUI.text = "Score: " + score;
-    speedGUI.text = "Speed: " + speed.toFixed(2);
-    score2GUI.text = "Last Bowl: " + oneThrowAgo;
+    scoreGUI.textBlock.text = "Score: " + score;
+    speedGUI.textBlock.text = "Speed: " + speed.toFixed(2);
+    score2GUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
 };
 
 var countStandingPins = function() {
@@ -644,7 +621,7 @@ var manageFrames = function() {
         scorecard.push("/");
     } else if (frameNum < 10) {
         scorecard.push(curRollCount);
-    } else if (scorecard.length == 18) {
+    } else if (scorecard.length == 18) { //top of 10th frame
         if (curRollCount == 10) {
             extraFrame = true;
             scorecard.push("X");
@@ -661,7 +638,7 @@ var manageFrames = function() {
         } else {
             scorecard.push(curRollCount);
         }
-    } else if (scorecard.length == 20) {
+    } else if (scorecard.length == 20) { //extra frame
         if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && curRollCount == 10) {
             scorecard.push("X");
             extraFrame = true;
@@ -671,7 +648,6 @@ var manageFrames = function() {
         } else {
             scorecard.push(curRollCount);
         }
-
     }
 
     threeThrowAgo = twoThrowAgo;
@@ -723,12 +699,62 @@ var cleanupFrame = function() {
     cleanupPins();
 };
 
+//var x = function(){};
+var rmGUI = function() {
+    frameGUI.dispose();
+    scoreGUI.dispose();
+    speedGUI.dispose();
+    score2GUI.dispose();
+};
+
+var endGameGUI = function() {
+    var resetBtn;
+
+    gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+
+    scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", "");
+    formatBtn(scoreGUI);
+
+    scoreGUI.textBlock.text = "Score: " + score;
+    scoreGUI.fontSize = 48;
+    scoreGUI.height = "15%";
+    scoreGUI.width = "40%";
+    gameGUI.addControl(scoreGUI);
+
+    resetBtn = BABYLON.GUI.Button.CreateSimpleButton("reset", "Play Again?");
+    formatBtn(resetBtn);
+    resetBtn.top = "42%";
+    resetBtn.onPointerUpObservable.add(function() {
+        currScene = 1;
+    });
+    gameGUI.addControl(resetBtn);
+};
+
 var endGame = function() {
-  //DISPLAY SCORE AND RETURN TO MAIN MENU AFTER CONFIRMING  
+    //DISPLAY SCORE AND RETURN TO MAIN MENU AFTER CONFIRMING
+    rmGUI();
+    endGameGUI();
+};
+
+var resetVariables = function() {
+    topFrame = true;
+    frameNum = 1;
+    scorecard = [];
+    score = 0;
+    oneThrowAgo = 0;
+    twoThrowAgo = 0;
+    threeThrowAgo = 0;
+    gameOver = false;
+    extraFrame = false;
+    isSetup = false;
 };
 
 var addGameLogic = function() {
     addController();
+    if (firstTime && testingBOOL)
+        firstTime = false;
+    else
+        resetVariables();
 
     gameScene.registerAfterRender(function() {
         updateGUI();
