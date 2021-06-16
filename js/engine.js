@@ -31,18 +31,28 @@ var topFrame = true; //for checking first or second half of frame
 var isSetup = false; // for setting up pins
 var map = {}; //object for multiple key presses
 
+var gameOver = false;
 var extraFrame = false;
-var frameNum = 1;
 var startTimer, endTimer;
 var curRollCount = 0;
+//*
+var frameNum = 10;
+var scoreboard = [10, 0, 7, 2, 5, 4, 8, 2, 4, 4, 8, 2, 4, 4, 7, 0, 10, 0];
+var score = 88;
+var oneThrowAgo = 10; //for spare/strike calculation
+var twoThrowAgo = 0; //for spare/strike calculation
+var threeThrowAgo = 7; //for spare/strike calculation
+//*/
+/*
+var frameNum = 1;
 var scoreboard = [];
 var score = 0;
 var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
-var threeThrowAgo = 0;
+var threeThrowAgo = 0; //for spare/strike calculation
+*/
 
 //pin variables
-var remainingPins = [true, true, true, true, true, true, true, true, true, true];
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
 var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
 var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10;
@@ -617,9 +627,9 @@ var updateGUI = function() {
 var countStandingPins = function() {
     var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
     for (var i = 0; i < 10; i = i + 1) {
-        if (remainingPins[i]) {
+        if (pinStanding[i]) {
             if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
-                remainingPins[i] = false;
+                pinStanding[i] = false;
                 curRollCount += 1;
             }
         }
@@ -636,18 +646,13 @@ var manageFrames = function() {
         }
     } else if (frameNum == 10) {
         if (topFrame) { //top of 10th frame
-            if (curRollCount == 10) {
+            if (curRollCount == 10)
                 extraFrame = true;
-                scoreboard.push(curRollCount);
-            }
+            scoreboard.push(curRollCount);
         } else { //bottom of 10th frame
-            if (curRollCount == 10) {
+            if (curRollCount == 10 || ((curRollCount + oneThrowAgo) == 10))
                 extraFrame = true;
-                scoreboard.push(curRollCount);
-            } else if ((curRollCount + oneThrowAgo) == 10) {
-                extraFrame = true;
-                scoreboard.push(curRollCount);
-            }
+            scoreboard.push(curRollCount);
         }
     } else if (frameNum == 11 && topFrame && extraFrame) {
         scoreboard.push(curRollCount);
@@ -664,48 +669,42 @@ var manageFrames = function() {
     else
         topFrame = false;
 
-    if (topFrame && frameNum < 12)
-        remainingPins = [true, true, true, true, true, true, true, true, true, true];
+    if (topFrame && frameNum < 11)
+        pinStanding = [true, true, true, true, true, true, true, true, true, true];
+    //extra frame earned on first throw of 10th
+    else if (frameNum == 10 && !topFrame && extraFrame)
+        pinStanding = [true, true, true, true, true, true, true, true, true, true];
+    //extra frame earned on 2nd throw of 10th
+    else if (frameNum == 11 && topFrame && ((oneThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10))
+        pinStanding = [true, true, true, true, true, true, true, true, true, true];
+};
+
+var checkStrike = function() {
+    if (threeThrowAgo == 10)
+        score += 10 + twoThrowAgo + oneThrowAgo;
+};
+
+var checkSpare = function() {
+    if ((threeThrowAgo + twoThrowAgo == 10) && threeThrowAgo != 10)
+        score += 10 + oneThrowAgo;
 };
 
 var calculateScore = function() {
-    if (threeThrowAgo == 10 && frameNum < 12) //threw a strike three throws ago so calulate
-        score += 10 + twoThrowAgo + oneThrowAgo;
-    if (topFrame && frameNum < 10) { //threw a spare so calculate
-        if ((oneThrowAgo + twoThrowAgo != 10) && oneThrowAgo != 10)
+    checkStrike();
+    if (topFrame && frameNum < 11 && !extraFrame) {
+        if ((oneThrowAgo + twoThrowAgo != 10) && oneThrowAgo != 10) { // no strike or spare
             score += oneThrowAgo + twoThrowAgo;
-    } else if (!topFrame && frameNum < 10) {
-        if ((threeThrowAgo + twoThrowAgo == 10) && twoThrowAgo != 10)
-            score += 10 + oneThrowAgo;
-    } else if (frameNum == 10) { //score of 10th frame
-        if ((twoThrowAgo + oneThrowAgo) == 10 && oneThrowAgo != 10) //no strike on last throw but pick up spare
-            score += 10 + twoThrowAgo + oneThrowAgo;
-        if (oneThrowAgo == 10)
-            score += 10 + oneThrowAgo
-    } else if (topFrame && frameNum == 11 && extraFrame) { // if got the extra frame
-        if ((threeThrowAgo + twoThrowAgo + oneThrowAgo) == 30)
-            score += 30;
-        if (threeThrowAgo == 10)
-            score += 10 + twoThrowAgo + oneThrowAgo;
-        if (twoThrowAgo == 10)
-            score += twoThrowAgo + oneThrowAgo;
-        if (oneThrowAgo > 0)
-            score += oneThrowAgo;
+        }
+    } else if (!topFrame) {
+        checkSpare();
     }
 };
 
 var setupForThrow = function() {
-    /*
-    if (extraFrame)
-        extraFrame = false;
-    */
     addCar();
     cam.position = new BABYLON.Vector3(0, 40, -250);
     cam.lockedTarget = carMesh.getAbsolutePosition();
-    if (topFrame)
-        setupPins(pinStanding);
-    else
-        setupPins(remainingPins);
+    setupPins(pinStanding);
     isSetup = true;
 };
 
@@ -724,6 +723,9 @@ var addGameLogic = function() {
         //setup pins for next throw if needed 
         if (!isSetup && (frameNum < 11 || extraFrame))
             setupForThrow();
+        else {
+            gameOver = true;
+        }
 
         if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
             overRamp = true;
@@ -735,8 +737,8 @@ var addGameLogic = function() {
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 12000) {
-                //Count pins knocked over after 12 secs
+            if ((endTimer - startTimer) >= 15000) {
+                //Count pins knocked over after 15 secs
                 cleanupFrame();
                 manageFrames();
                 calculateScore();
