@@ -1,13 +1,11 @@
 BUGS:
-Strike needs to advance to next frame instead of bottom of frame
+N/A
 
 TODO:
-Fix End Game
 Fix car mechanics
 
 POSSIBLE CHANGES:
 change 12 sec wait on pins failing to no movement from pins
-move pin island up for better view of remaining pins
 
 
 FUTURE ADDONS:

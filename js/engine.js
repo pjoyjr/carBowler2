@@ -335,7 +335,7 @@ var addStationaryObjects = function() {
     //CREATE ISLAND FOR PINS
     //island for collision and bounce
     islandMesh = BABYLON.MeshBuilder.CreateBox("islandMesh", { height: 22, width: 70, depth: 70 }, gameScene);
-    islandMesh.position = new BABYLON.Vector3(0, 0, 170);
+    islandMesh.position = new BABYLON.Vector3(0, 25, 170);
     islandMeshMat = new BABYLON.StandardMaterial("islandMeshMat", gameScene);
     islandMeshMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
     islandMeshMat.alpha = islandMeshAlpha;
@@ -343,7 +343,7 @@ var addStationaryObjects = function() {
 
     //island where pins pins sit on
     island = BABYLON.MeshBuilder.CreateBox("island", { height: 14, width: 70, depth: 70 }, gameScene);
-    island.position = new BABYLON.Vector3(0, 0, 170);
+    island.position = new BABYLON.Vector3(0, 25, 170);
     islandMat = new BABYLON.StandardMaterial("islandMat", gameScene);
     islandMat.alpha = islandMatAlpha;
     islandMat.diffuseTexture = planksTexture;
@@ -395,7 +395,7 @@ var setupPins = function(pinsStanding) {
     pinMesh = new BABYLON.StandardMaterial(gameScene);
     pinMesh.alpha = pinMeshAlpha;
     var pinDIM = { height: 30, diameterTop: 5, diameterBottom: 9, tessellation: 12 };
-
+    var pinHeight = 50;
     for (var i = 0; i < 10; i = i + 1) {
         if (pinsStanding[i]) {
             switch (i) {
@@ -403,7 +403,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB1 = BABYLON.MeshBuilder.CreateCylinder("pinB1", pinDIM, gameScene);
-                            pinB1.position = new BABYLON.Vector3(0, 38, 148);
+                            pinB1.position = new BABYLON.Vector3(0, pinHeight, 148);
                             pinB1.material = pinMesh;
                             pinB1.physicsImpostor = new BABYLON.PhysicsImpostor(pinB1, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin1 = newMeshes[0];
@@ -415,7 +415,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB2 = BABYLON.MeshBuilder.CreateCylinder("pinB2", pinDIM, gameScene);
-                            pinB2.position = new BABYLON.Vector3(-7.5, 38, 163);
+                            pinB2.position = new BABYLON.Vector3(-7.5, pinHeight, 163);
                             pinB2.material = pinMesh;
                             pinB2.physicsImpostor = new BABYLON.PhysicsImpostor(pinB2, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin2 = newMeshes[0];
@@ -427,7 +427,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB3 = BABYLON.MeshBuilder.CreateCylinder("pinB3", pinDIM, gameScene);
-                            pinB3.position = new BABYLON.Vector3(7.5, 38, 163);
+                            pinB3.position = new BABYLON.Vector3(7.5, pinHeight, 163);
                             pinB3.material = pinMesh;
                             pinB3.physicsImpostor = new BABYLON.PhysicsImpostor(pinB3, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin3 = newMeshes[0];
@@ -439,7 +439,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB4 = BABYLON.MeshBuilder.CreateCylinder("pinB4", pinDIM, gameScene);
-                            pinB4.position = new BABYLON.Vector3(-15, 38, 178);
+                            pinB4.position = new BABYLON.Vector3(-15, pinHeight, 178);
                             pinB4.material = pinMesh;
                             pinB4.physicsImpostor = new BABYLON.PhysicsImpostor(pinB4, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin4 = newMeshes[0];
@@ -451,7 +451,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB5 = BABYLON.MeshBuilder.CreateCylinder("pinB5", pinDIM, gameScene);
-                            pinB5.position = new BABYLON.Vector3(0, 38, 178);
+                            pinB5.position = new BABYLON.Vector3(0, pinHeight, 178);
                             pinB5.material = pinMesh;
                             pinB5.physicsImpostor = new BABYLON.PhysicsImpostor(pinB5, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin5 = newMeshes[0];
@@ -463,7 +463,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB6 = BABYLON.MeshBuilder.CreateCylinder("pinB6", pinDIM, gameScene);
-                            pinB6.position = new BABYLON.Vector3(15, 38, 178);
+                            pinB6.position = new BABYLON.Vector3(15, pinHeight, 178);
                             pinB6.material = pinMesh;
                             pinB6.physicsImpostor = new BABYLON.PhysicsImpostor(pinB6, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin6 = newMeshes[0];
@@ -475,7 +475,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB7 = BABYLON.MeshBuilder.CreateCylinder("pinB7", pinDIM, gameScene);
-                            pinB7.position = new BABYLON.Vector3(-22.5, 38, 193);
+                            pinB7.position = new BABYLON.Vector3(-22.5, pinHeight, 193);
                             pinB7.material = pinMesh;
                             pinB7.physicsImpostor = new BABYLON.PhysicsImpostor(pinB7, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin7 = newMeshes[0];
@@ -487,7 +487,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB8 = BABYLON.MeshBuilder.CreateCylinder("pinB8", pinDIM, gameScene);
-                            pinB8.position = new BABYLON.Vector3(-7.5, 38, 193);
+                            pinB8.position = new BABYLON.Vector3(-7.5, pinHeight, 193);
                             pinB8.material = pinMesh;
                             pinB8.physicsImpostor = new BABYLON.PhysicsImpostor(pinB8, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin8 = newMeshes[0];
@@ -499,7 +499,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB9 = BABYLON.MeshBuilder.CreateCylinder("pinB9", pinDIM, gameScene);
-                            pinB9.position = new BABYLON.Vector3(7.5, 38, 193);
+                            pinB9.position = new BABYLON.Vector3(7.5, pinHeight, 193);
                             pinB9.material = pinMesh;
                             pinB9.physicsImpostor = new BABYLON.PhysicsImpostor(pinB9, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin9 = newMeshes[0];
@@ -511,7 +511,7 @@ var setupPins = function(pinsStanding) {
                     BABYLON.SceneLoader.ImportMesh("Pin", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/pin.babylon", gameScene,
                         function(newMeshes) {
                             pinB10 = BABYLON.MeshBuilder.CreateCylinder("pinB10", pinDIM, gameScene);
-                            pinB10.position = new BABYLON.Vector3(22.5, 38, 193);
+                            pinB10.position = new BABYLON.Vector3(22.5, pinHeight, 193);
                             pinB10.material = pinMesh;
                             pinB10.physicsImpostor = new BABYLON.PhysicsImpostor(pinB10, BABYLON.PhysicsImpostor.CylinderImpostor, pinPHYSICS, gameScene);
                             pin10 = newMeshes[0];
