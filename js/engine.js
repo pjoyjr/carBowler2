@@ -36,7 +36,7 @@ var extraFrame = false;
 var startTimer, endTimer;
 var curRollCount = 0;
 
-/*
+
 var topFrame = true;
 var frameNum = 1;
 var scorecard = [];
@@ -44,11 +44,10 @@ var score = 0;
 var oneThrowAgo = 0; //for spare/strike calculation
 var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0; //for spare/strike calculation
-*/
+
 
 var testingBOOL = false;
-
-var firstTime = true;
+/*
 var frameNum = 10;
 var topFrame = false;
 var scorecard = ["-", "X", 9, "/", "0", "0", 2, 4, 3, 3, 6, "/", 9, "/", "0", "0", "-", "X", 0];
@@ -56,6 +55,7 @@ var score = 71;
 var oneThrowAgo = [0, 18]; //for spare/strike calculation
 var twoThrowAgo = [10, 17]; //for spare/strike calculation
 var threeThrowAgo = [0, 15]; //for spare/strike calculation
+*/
 
 //pin variables
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
@@ -67,7 +67,7 @@ var pinMesh, pinMeshAlpha = 0;
 var speed = 0;
 var accel = .4667;
 var decel = -.25;
-var MAXSPEED = 10;
+var MAXSPEED = 12;
 var carMoved = false;
 
 //physics info for pins and car
@@ -360,15 +360,17 @@ var addStationaryObjects = function() {
 var addCar = function() {
     var carMeshMat;
     var carMeshAlpha = 0;
+    var randomStartPosition = Math.random() * 46 - 23;
 
     overRamp = false;
     //create bounding box for physics engine
     carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, gameScene);
-    carMesh.position = new BABYLON.Vector3(0, 18, -180);
+    carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
     carMeshMat = new BABYLON.StandardMaterial(gameScene);
     carMeshMat.alpha = carMeshAlpha;
     carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
     carMesh.material = carMeshMat;
+
 
     //load in car from blender
     BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
@@ -604,8 +606,10 @@ var updateGUI = function() {
 var countStandingPins = function() {
     var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
     for (var i = 0; i < 10; i = i + 1) {
+        console.log(pinBArray[i].getAbsolutePosition().y)
         if (pinStanding[i]) {
-            if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) {
+            //if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) { 
+            if (pinBArray[i].getAbsolutePosition().y < 50.5 || pinBArray[i].getAbsolutePosition().y > 51.5) {
                 pinStanding[i] = false;
                 curRollCount += 1;
             }
@@ -699,7 +703,6 @@ var cleanupFrame = function() {
     cleanupPins();
 };
 
-//var x = function(){};
 var rmGUI = function() {
     frameGUI.dispose();
     scoreGUI.dispose();
@@ -751,8 +754,8 @@ var resetVariables = function() {
 
 var addGameLogic = function() {
     addController();
-    if (firstTime && testingBOOL)
-        firstTime = false;
+    if (testingBOOL)
+        pass;
     else
         resetVariables();
 
