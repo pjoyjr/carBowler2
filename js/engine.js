@@ -386,6 +386,16 @@ var addCar = function() {
     carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
     carMesh.material = carMeshMat;
 
+    BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
+        function(newMeshes) {
+            car = newMeshes[0];
+            car.scaling = new BABYLON.Vector3(3, 3, 5);
+            car.position = carMesh.getAbsolutePosition();
+            carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+        });
+
+
+    /*
     //Wheels
     pivotFI = new BABYLON.Mesh("pivotFI", gameScene);
     pivotFO = new BABYLON.Mesh("pivotFO", gameScene);
@@ -398,13 +408,14 @@ var addCar = function() {
     wheelMaterial.diffuseTexture = wheelTexture;
     wheelFI.material = wheelMaterial;
     wheelFI.rotate(BABYLON.Axis.X, Math.PI / 2, BABYLON.Space.WORLD); //rotate wheel so tread in xz plane  
-
+    
     pivotFI.position = new BABYLON.Vector3(-6.5, 0, -2);
     pivotFO.position = new BABYLON.Vector3(-6.5, 0, 2);
     wheelFI.position = new BABYLON.Vector3(0, 0, -1.8);
     wheelFO.position = new BABYLON.Vector3(0, 0, 1.8);
     wheelRI.position = new BABYLON.Vector3(0, 0, -2.8);
     wheelRO.position = new BABYLON.Vector3(0, 0, 2.8);
+    
     pivotFI.parent = carMesh;
     pivotFO.parent = carMesh;
     wheelFI.parent = pivotFI;
@@ -412,23 +423,12 @@ var addCar = function() {
     wheelRI.parent = carMesh;
     wheelRO.parent = carMesh;
 
-    //load in car from blender
-    BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
-        function(newMeshes) {
-            car = newMeshes[0];
-            car.scaling = new BABYLON.Vector3(3, 3, 5);
-            car.position = carMesh.getAbsolutePosition();
-            carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-        });
-
     pivot = new BABYLON.Mesh("pivot", gameScene); //current centre of rotation
     pivot.position.z = 50;
     carMesh.parent = pivot;
+    */
 
     carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
-    /*
-    //Create Car Centre of Rotation
-    */
 };
 
 //Function to remove car
@@ -631,15 +631,15 @@ var addCarMechanics = function() {
     if ((map["a"] || map["A"]) && -Math.PI / 6 < theta) {
         deltaTheta = -Math.PI / 252;
         theta += deltaTheta;
-        pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
+        //pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
+        //pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
         if (Math.abs(theta) > 0.00000001) {
             nextRadius = axelLength / 2 + distancePivots / Math.tan(theta);
         } else {
             theta = 0;
             nextRadius = 0;
         }
-        pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
+        //pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
         carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
         turnRadius = nextRadius;
 
@@ -648,15 +648,15 @@ var addCarMechanics = function() {
     if ((map["d"] || map["D"]) && theta < Math.PI / 6) {
         deltaTheta = Math.PI / 252;
         theta += deltaTheta;
-        pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
+        //pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
+        //pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
         if (Math.abs(theta) > 0.00000001) {
             nextRadius = axelLength / 2 + distancePivots / Math.tan(theta);
         } else {
             theta = 0;
             nextRadius = 0;
         }
-        pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
+        //pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
         carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
         turnRadius = nextRadius;
 
@@ -665,23 +665,24 @@ var addCarMechanics = function() {
     if (dps > 0) {
         phi = dps / (turnRadius * fps);
         if (Math.abs(theta) > 0) {
-            pivot.rotate(BABYLON.Axis.Y, phi, BABYLON.Space.WORLD);
+            //pivot.rotate(BABYLON.Axis.Y, phi, BABYLON.Space.WORLD);
             psiRI = dps / (wheelRadius * fps);
             psiRO = dps * (turnRadius + axelLength) / (wheelRadius * fps);
             psiFI = dps * Math.sqrt(turnRadius * turnRadius + distancePivots * distancePivots) / (wheelRadius * fps);
             psiFO = dps * Math.sqrt((turnRadius + axelLength) * (turnRadius + axelLength) + distancePivots * distancePivots) / (wheelRadius * fps);
 
-            wheelFI.rotate(BABYLON.Axis.Y, psiFI, BABYLON.Space.LOCAL);
-            wheelFO.rotate(BABYLON.Axis.Y, psiFO, BABYLON.Space.LOCAL);
-            wheelRI.rotate(BABYLON.Axis.Y, psiRI, BABYLON.Space.LOCAL);
-            wheelRO.rotate(BABYLON.Axis.Y, psiRO, BABYLON.Space.LOCAL);
+            //wheelFI.rotate(BABYLON.Axis.Y, psiFI, BABYLON.Space.LOCAL);
+            //wheelFO.rotate(BABYLON.Axis.Y, psiFO, BABYLON.Space.LOCAL);
+            //wheelRI.rotate(BABYLON.Axis.Y, psiRI, BABYLON.Space.LOCAL);
+            //wheelRO.rotate(BABYLON.Axis.Y, psiRO, BABYLON.Space.LOCAL);
         } else {
-            pivot.translate(BABYLON.Axis.X, -distance, BABYLON.Space.LOCAL);
-            wheelFI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelFO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelRI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelRO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-        }
+            pass;
+            //pivot.translate(BABYLON.Axis.X, -distance, BABYLON.Space.LOCAL);
+            //wheelFI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
+            //wheelFO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
+            //wheelRI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
+            //wheelRO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
+        } //
     }
 
 
