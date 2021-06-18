@@ -129,7 +129,8 @@ var createMainMenuScene = function() {
     formatBtn(playBtn);
     playBtn.top = "42%";
     playBtn.onPointerUpObservable.add(function() {
-        currScene = 1;
+        //currScene = 1;
+        currScene = 2;
     });
     mainMenuGUI.addControl(playBtn);
 
@@ -398,6 +399,7 @@ var setupPins = function(pinsStanding) {
     pinMesh.alpha = pinMeshAlpha;
     var pinDIM = { height: 30, diameterTop: 5, diameterBottom: 9, tessellation: 12 };
     var pinHeight = 50;
+
     for (var i = 0; i < 10; i = i + 1) {
         if (pinsStanding[i]) {
             switch (i) {
@@ -606,9 +608,7 @@ var updateGUI = function() {
 var countStandingPins = function() {
     var pinBArray = [pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10];
     for (var i = 0; i < 10; i = i + 1) {
-        console.log(pinBArray[i].getAbsolutePosition().y)
         if (pinStanding[i]) {
-            //if (pinBArray[i].getAbsolutePosition().y < 25.0 || pinBArray[i].getAbsolutePosition().y > 27.0) { 
             if (pinBArray[i].getAbsolutePosition().y < 50.5 || pinBArray[i].getAbsolutePosition().y > 51.5) {
                 pinStanding[i] = false;
                 curRollCount += 1;
@@ -728,7 +728,7 @@ var endGameGUI = function() {
     formatBtn(resetBtn);
     resetBtn.top = "42%";
     resetBtn.onPointerUpObservable.add(function() {
-        currScene = 1;
+        currScene = 0;
     });
     gameGUI.addControl(resetBtn);
 };
