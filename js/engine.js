@@ -419,11 +419,7 @@ var addCar = function() {
     wheelRO.parent = carMesh;
     wheelRO.position = new BABYLON.Vector3(3, -2, -2.8);
 
-
-    pivot = new BABYLON.Mesh("pivot", gameScene); //current centre of rotation
-    pivot.position.z = turnRadius;
-    carMesh.parent = pivot;
-    carMesh.position = new BABYLON.Vector3(randomStartPosition, 16, -180 - turnRadius);
+    carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
     //carMesh.position = new BABYLON.Vector3(randomStartPosition, 15.75, -180);
 
     carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
@@ -431,7 +427,7 @@ var addCar = function() {
 
 //Function to remove car
 var rmCar = function() {
-    pivot.dispose();
+    carMesh.dispose();
     car.dispose(); //TODO ENABLE WITH BLENDERIMPORT
 };
 
@@ -637,8 +633,7 @@ var addCarMechanics = function() {
             theta = 0;
             nextRadius = 0;
         }
-        pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
-        carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
+        //carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
         turnRadius = nextRadius;
 
     };
@@ -654,8 +649,7 @@ var addCarMechanics = function() {
             theta = 0;
             nextRadius = 0;
         }
-        pivot.translate(BABYLON.Axis.Z, nextRadius - turnRadius, BABYLON.Space.LOCAL);
-        carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
+        //carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
         turnRadius = nextRadius;
 
     };
@@ -663,7 +657,6 @@ var addCarMechanics = function() {
     if (dps > 0) {
         phi = dps / (turnRadius * fps);
         if (Math.abs(theta) > 0) {
-            pivot.rotate(BABYLON.Axis.Y, phi, BABYLON.Space.WORLD);
             psiRI = dps / (wheelRadius * fps);
             psiRO = dps * (turnRadius + axelLength) / (wheelRadius * fps);
             psiFI = dps * Math.sqrt(turnRadius * turnRadius + distancePivots * distancePivots) / (wheelRadius * fps);
@@ -674,7 +667,6 @@ var addCarMechanics = function() {
             wheelRI.rotate(BABYLON.Axis.Y, psiRI, BABYLON.Space.LOCAL);
             wheelRO.rotate(BABYLON.Axis.Y, psiRO, BABYLON.Space.LOCAL);
         } else {
-            pivot.translate(BABYLON.Axis.X, -distance, BABYLON.Space.LOCAL);
             wheelFI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
             wheelFO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
             wheelRI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
