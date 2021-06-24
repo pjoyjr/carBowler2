@@ -58,26 +58,17 @@ var pinStanding = [true, true, true, true, true, true, true, true, true, true];
 var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
 var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10;
 var pinMesh, pinMeshAlpha = 0;
+var pinPHYSICS = { mass: 3, restitution: 0.0 };
 
 //car variables  
-var car, carMesh, pivot;
-var pivotFI, pivotFO, wheelRO, wheelRI, wheelFO, wheelFI;
-var theta = 0;
-var deltaTheta = 0;
-var dps = 0; //distance translated per second
-var turnRadius = 50; //turning radius, initial set at pivot z value
-var nextRadius; //Next turning radius on wheel turn
-var axelLength = 4; // axel length
-var distancePivots = 4; //distance between wheel pivots
-var wheelRadius = 1.5; // wheel radius
-var psi, psiRI, psiRO, psFI, psiFO; //wheel rotations  
-var phi; //rotation of car when turning 
+var car, carMesh;
+var wheelRadius = 5,
+    carHeight = 5,
+    carWidth = 7,
+    carDepth = 10;
+var fdWheel, fpWheel, bdWheel, bpWheel;
 
 var fps; // frames per second	
-
-//physics info for pins and car
-var pinPHYSICS = { mass: 3, restitution: 0.0 };
-var carPHYSICS = { mass: 10, restitution: 0.0 };
 
 var degToRadians = function(degrees) {
     var radians = degrees * Math.PI / 180;
@@ -264,7 +255,6 @@ var createGameGUI = function() {
 
 //Function to add all non moving objects to scene
 var addStationaryObjects = function() {
-
     //scene and objects
     var skybox, skyboxMaterial, ground, groundMaterial, water, waterMesh;
     var lane, laneMesh, laneMeshMat;
@@ -364,71 +354,125 @@ var addStationaryObjects = function() {
 
 //Function to add car to scene
 var addCar = function() {
-    var carMeshMat;
-    var carMeshAlpha = 0;
-    var randomStartPosition = Math.random() * 46 - 23;
-    var faceColors = [];
-    var faceUV = []; //set texture for flat face of wheel 
-    faceColors[1] = new BABYLON.Color3(0, 0, 0);
-    faceUV[0] = new BABYLON.Vector4(0, 0, 1, 1);
-    faceUV[2] = new BABYLON.Vector4(0, 0, 1, 1);
+    var carMeshMat, susHolderMat;
+    var fdSusHolder, fpSusHolder, bdSusHolder, bpSusHolder;
+    //var randomStartPosition = Math.random() * 46 - 23;
     overRamp = false;
 
-    //create bounding box for physics engine
-    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, gameScene);
+    carMesh = BABYLON.MeshBuilder.CreateBox("carMesh", {
+        width: carWidth,
+        height: carHeight,
+        depth: carDepth
+    }, gameScene);
+
+    //Material
     carMeshMat = new BABYLON.StandardMaterial(gameScene);
-    carMeshMat.alpha = carMeshAlpha;
-    carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
+    susHolderMat = new BABYLON.StandardMaterial(gameScene);
+    carMeshMat.alpha = 1;
+    susHolderMat.alpha = 1;
+    susHolderMat.diffuseColor = new BABYLON.Color3(0, 180, 0); //limeGreen
     carMesh.material = carMeshMat;
 
+
+
+    //Wheels
+    fdWheel = BABYLON.MeshBuilder.CreateSphere("fdWheel", {
+        diameterY: wheelRadius,
+        diameterX: wheelRadius / 2,
+        diameterZ: wheelRadius,
+        segments: 5
+    }, gameScene);
+    fpWheel = BABYLON.MeshBuilder.CreateSphere("fpWheel", {
+        diameterY: wheelRadius,
+        diameterX: wheelRadius / 2,
+        diameterZ: wheelRadius,
+        segments: 5
+    }, gameScene);
+    bdWheel = BABYLON.MeshBuilder.CreateSphere("bdWheel", {
+        diameterY: wheelRadius,
+        diameterX: wheelRadius / 2,
+        diameterZ: wheelRadius,
+        segments: 5
+    }, gameScene);
+    bpWheel = BABYLON.MeshBuilder.CreateSphere("bpWheel", {
+        diameterY: wheelRadius,
+        diameterX: wheelRadius / 2,
+        diameterZ: wheelRadius,
+        segments: 5
+    }, gameScene);
+
+    var tireDistance = 8; //Distance from center of car to tire
+    var tireToFront = 5;
+    var tireToBack = -5;
+    var carStartingX = 0;
+    var carStartingY = 20;
+    var carStartingZ = -180;
+    fdWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY, carStartingZ + tireToFront);
+    fpWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY, carStartingZ + tireToFront);
+    bpWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY, carStartingZ + tireToBack);
+    bdWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY, carStartingZ + tireToBack);
+    carMesh.position = new BABYLON.Vector3(carStartingX, carStartingY, carStartingZ);
+
+    //suspensions:
+    var susHolderSize = {
+        height: carHeight / 2,
+        width: carHeight / 2,
+        depth: carHeight / 4
+    };
+
+    fdSusHolder = BABYLON.MeshBuilder.CreateBox("fdSuspension", susHolderSize, gameScene);
+    fpSusHolder = BABYLON.MeshBuilder.CreateBox("fpSuspension", susHolderSize, gameScene);
+    bdSusHolder = BABYLON.MeshBuilder.CreateBox("bdSuspension", susHolderSize, gameScene);
+    bpSusHolder = BABYLON.MeshBuilder.CreateBox("bpSuspension", susHolderSize, gameScene);
+
+    fdSusHolder.position = new BABYLON.Vector3(carStartingX - carWidth, carStartingY - (carHeight / 2), carStartingZ - carDepth);
+    fpSusHolder.position = new BABYLON.Vector3(carStartingX + carWidth, carStartingY - (carHeight / 2), carStartingZ - carDepth);
+    bdSusHolder.position = new BABYLON.Vector3(carStartingX + carWidth, carStartingY - (carHeight / 2), carStartingZ + carDepth);
+    bpSusHolder.position = new BABYLON.Vector3(carStartingX - carWidth, carStartingY - (carHeight / 2), carStartingZ + carDepth);
+
+    var carPHYSICS = {
+        mass: 80,
+        friction: 0.5,
+        restitution: 0.5,
+        nativeOptions: {
+            noSleep: true,
+            move: true
+        }
+    };
+    var tirePHYSICS = {
+        mass: 1,
+        friction: 4,
+        restitution: 0.5,
+        nativeOptions: {
+            move: true
+        }
+    };
+    var susHolderPHYSICS = {
+        mass: 8,
+        friction: 4,
+        restitution: 0.5
+    };
+
+    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.BoxImpostor, carPHYSICS, gameScene);
+    [fdWheel, fpWheel, bdWheel, bpWheel].forEach(function(w) {
+        w.physicsImpostor = new BABYLON.PhysicsImpostor(w, BABYLON.PhysicsImpostor.SphereImpostor, tirePHYSICS, gameScene);
+    });
+    [fdSusHolder, fpSusHolder, bdSusHolder, bpSusHolder].forEach(function(h) {
+        //h.isVisible = false;
+        h.material = susHolderMat;
+        h.physicsImpostor = new BABYLON.PhysicsImpostor(h, BABYLON.PhysicsImpostor.SphereImpostor, susHolderPHYSICS, gameScene);
+    });
+
+    /*
     BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
             car.scaling = new BABYLON.Vector3(3, 3, 5);
             car.position = carMesh.getAbsolutePosition();
         });
-
-    var wheelMaterial = new BABYLON.StandardMaterial("wheel_mat", gameScene);
-    var wheelTexture = new BABYLON.Texture("http://i.imgur.com/ZUWbT6L.png", gameScene);
-    wheelMaterial.diffuseTexture = wheelTexture;
-    wheelFI = BABYLON.MeshBuilder.CreateCylinder("wheelFI", { diameter: 3, height: 1, tessellation: 24, faceColors: faceColors, faceUV: faceUV }, gameScene);
-    wheelFI.material = wheelMaterial;
-    wheelFI.rotate(BABYLON.Axis.X, Math.PI / 2, BABYLON.Space.WORLD);
-    wheelFI.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.WORLD);
-
-    pivotFI = new BABYLON.Mesh("pivotFI", gameScene);
-    pivotFI.parent = carMesh;
-    pivotFI.position = new BABYLON.Vector3(-3, 0, 2);
-
-    pivotFO = new BABYLON.Mesh("pivotFO", gameScene);
-    pivotFO.parent = carMesh;
-    pivotFO.position = new BABYLON.Vector3(3, 0, 2);
-
-
-    wheelFI.parent = pivotFI;
-    wheelFI.position = new BABYLON.Vector3(0, -2, 1.75);
-    wheelFO = wheelFI.createInstance("FO");
-    wheelFO.parent = pivotFO;
-    wheelFO.position = new BABYLON.Vector3(0, -2, 1.75);
-
-    wheelRI = wheelFI.createInstance("RI");
-    wheelRI.parent = carMesh;
-    wheelRI.position = new BABYLON.Vector3(-3, -2, -2.8);
-
-    wheelRO = wheelFI.createInstance("RO");
-    wheelRO.parent = carMesh;
-    wheelRO.position = new BABYLON.Vector3(3, -2, -2.8);
-
-    carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-    /*
-    pivot = new BABYLON.Mesh("pivot", scene); //current centre of rotation
-    pivot.position.z = 50;
-    carBody.parent = pivot;
-    carBody.position = new BABYLON.Vector3(0, 0, -50);
     */
-    //carMesh.position = new BABYLON.Vector3(randomStartPosition, 15.75, -180);
 
-    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
+    //carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.BoxImpostor, carPHYSICS, gameScene);
 };
 
 //Function to remove car
@@ -615,76 +659,18 @@ var addController = function() {
 var addCarMechanics = function() {
     fps = engine.getFps();
 
-    if (map[" "] && dps < 15) {
-        dps += 1;
+    /*
+    if (map[" "]) {
+        pass;
+    };
+    if ((map["a"] || map["A"])) {
+        pass;
     };
 
-    if (dps > 0.15) {
-        dps -= 0.15;
-    } else {
-        dps = 0;
-    }
-
-    distance = dps / fps;
-    psi = dps / (wheelRadius * fps);
-
-    if ((map["a"] || map["A"]) && -Math.PI / 6 < theta) {
-        deltaTheta = -Math.PI / 252;
-        theta += deltaTheta;
-        pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        if (Math.abs(theta) > 0.00000001) {
-            nextRadius = axelLength / 2 + distancePivots / Math.tan(theta);
-        } else {
-            theta = 0;
-            nextRadius = 0;
-        }
-        //pivot.translate(BABYLON.Axis.Z, NR - R, BABYLON.Space.LOCAL);
-        //carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
-        turnRadius = nextRadius;
-
+    if ((map["d"] || map["D"])) {
+        pass;
     };
-
-    if ((map["d"] || map["D"]) && theta < Math.PI / 6) {
-        deltaTheta = Math.PI / 252;
-        theta += deltaTheta;
-        pivotFI.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        pivotFO.rotate(BABYLON.Axis.Y, deltaTheta, BABYLON.Space.LOCAL);
-        if (Math.abs(theta) > 0.00000001) {
-            nextRadius = axelLength / 2 + distancePivots / Math.tan(theta);
-        } else {
-            theta = 0;
-            nextRadius = 0;
-        }
-        //pivot.translate(BABYLON.Axis.Z, NR - R, BABYLON.Space.LOCAL);
-        //carMesh.translate(BABYLON.Axis.Z, turnRadius - nextRadius, BABYLON.Space.LOCAL);
-        turnRadius = nextRadius;
-
-    };
-
-    if (dps > 0) {
-        phi = dps / (turnRadius * fps);
-        if (Math.abs(theta) > 0) {
-            //pivot.rotate(BABYLON.Axis.Y, phi, BABYLON.Space.WORLD);       
-            psiRI = dps / (wheelRadius * fps);
-            psiRO = dps * (turnRadius + axelLength) / (wheelRadius * fps);
-            psiFI = dps * Math.sqrt(turnRadius * turnRadius + distancePivots * distancePivots) / (wheelRadius * fps);
-            psiFO = dps * Math.sqrt((turnRadius + axelLength) * (turnRadius + axelLength) + distancePivots * distancePivots) / (wheelRadius * fps);
-
-            wheelFI.rotate(BABYLON.Axis.Y, psiFI, BABYLON.Space.LOCAL);
-            wheelFO.rotate(BABYLON.Axis.Y, psiFO, BABYLON.Space.LOCAL);
-            wheelRI.rotate(BABYLON.Axis.Y, psiRI, BABYLON.Space.LOCAL);
-            wheelRO.rotate(BABYLON.Axis.Y, psiRO, BABYLON.Space.LOCAL);
-        } else {
-            //pivot.translate(BABYLON.Axis.X, -distance, BABYLON.Space.LOCAL);
-            wheelFI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelFO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelRI.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-            wheelRO.rotate(BABYLON.Axis.Y, psi, BABYLON.Space.LOCAL);
-        }
-    }
-
-
+    */
 };
 
 var updateGUI = function() {
@@ -694,7 +680,7 @@ var updateGUI = function() {
         frameGUI.textBlock.text = "Bot " + frameNum;
     }
     scoreGUI.textBlock.text = "Score: " + score;
-    speedGUI.textBlock.text = "Speed: " + phi;
+    speedGUI.textBlock.text = "Speed: 0";
     score2GUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
 };
 
