@@ -62,7 +62,7 @@ var pinPHYSICS = { mass: 3, restitution: 0.0 };
 
 //car variables  
 var car, carMesh;
-var wheelRadius = 5,
+var wheelRadius = 3,
     carHeight = 5,
     carWidth = 7,
     carDepth = 10;
@@ -356,80 +356,24 @@ var addStationaryObjects = function() {
 var addCar = function() {
     var carMeshMat, susHolderMat;
     var fdSusHolder, fpSusHolder, bdSusHolder, bpSusHolder;
-    //var randomStartPosition = Math.random() * 46 - 23;
-    overRamp = false;
-
-    carMesh = BABYLON.MeshBuilder.CreateBox("carMesh", {
-        width: carWidth,
-        height: carHeight,
-        depth: carDepth
-    }, gameScene);
-
-    //Material
-    carMeshMat = new BABYLON.StandardMaterial(gameScene);
-    susHolderMat = new BABYLON.StandardMaterial(gameScene);
-    carMeshMat.alpha = 1;
-    susHolderMat.alpha = 1;
-    susHolderMat.diffuseColor = new BABYLON.Color3(0, 180, 0); //limeGreen
-    carMesh.material = carMeshMat;
-
-
-
-    //Wheels
-    fdWheel = BABYLON.MeshBuilder.CreateSphere("fdWheel", {
-        diameterY: wheelRadius,
-        diameterX: wheelRadius / 2,
-        diameterZ: wheelRadius,
-        segments: 5
-    }, gameScene);
-    fpWheel = BABYLON.MeshBuilder.CreateSphere("fpWheel", {
-        diameterY: wheelRadius,
-        diameterX: wheelRadius / 2,
-        diameterZ: wheelRadius,
-        segments: 5
-    }, gameScene);
-    bdWheel = BABYLON.MeshBuilder.CreateSphere("bdWheel", {
-        diameterY: wheelRadius,
-        diameterX: wheelRadius / 2,
-        diameterZ: wheelRadius,
-        segments: 5
-    }, gameScene);
-    bpWheel = BABYLON.MeshBuilder.CreateSphere("bpWheel", {
-        diameterY: wheelRadius,
-        diameterX: wheelRadius / 2,
-        diameterZ: wheelRadius,
-        segments: 5
-    }, gameScene);
-
-    var tireDistance = 8; //Distance from center of car to tire
+    var fdSliderJoint, fpSliderJoint, bdSliderJoint, bpSliderJoint;
+    var tireDistance = carWidth / 2 + .5; //Distance from center of car to tire
     var tireToFront = 5;
     var tireToBack = -5;
     var carStartingX = 0;
     var carStartingY = 20;
     var carStartingZ = -180;
-    fdWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY, carStartingZ + tireToFront);
-    fpWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY, carStartingZ + tireToFront);
-    bpWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY, carStartingZ + tireToBack);
-    bdWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY, carStartingZ + tireToBack);
-    carMesh.position = new BABYLON.Vector3(carStartingX, carStartingY, carStartingZ);
-
-    //suspensions:
     var susHolderSize = {
         height: carHeight / 2,
-        width: carHeight / 2,
-        depth: carHeight / 4
+        width: carHeight / 8,
+        depth: carHeight / 8
     };
-
-    fdSusHolder = BABYLON.MeshBuilder.CreateBox("fdSuspension", susHolderSize, gameScene);
-    fpSusHolder = BABYLON.MeshBuilder.CreateBox("fpSuspension", susHolderSize, gameScene);
-    bdSusHolder = BABYLON.MeshBuilder.CreateBox("bdSuspension", susHolderSize, gameScene);
-    bpSusHolder = BABYLON.MeshBuilder.CreateBox("bpSuspension", susHolderSize, gameScene);
-
-    fdSusHolder.position = new BABYLON.Vector3(carStartingX - carWidth, carStartingY - (carHeight / 2), carStartingZ - carDepth);
-    fpSusHolder.position = new BABYLON.Vector3(carStartingX + carWidth, carStartingY - (carHeight / 2), carStartingZ - carDepth);
-    bdSusHolder.position = new BABYLON.Vector3(carStartingX + carWidth, carStartingY - (carHeight / 2), carStartingZ + carDepth);
-    bpSusHolder.position = new BABYLON.Vector3(carStartingX - carWidth, carStartingY - (carHeight / 2), carStartingZ + carDepth);
-
+    var wheelDim = {
+        diameterY: wheelRadius,
+        diameterX: wheelRadius / 2,
+        diameterZ: wheelRadius,
+        segments: 5
+    };
     var carPHYSICS = {
         mass: 80,
         friction: 0.5,
@@ -453,17 +397,115 @@ var addCar = function() {
         restitution: 0.5
     };
 
+    //var randomStartPosition = Math.random() * 46 - 23;
+    overRamp = false;
+
+    //Materials
+    carMeshMat = new BABYLON.StandardMaterial(gameScene);
+    susHolderMat = new BABYLON.StandardMaterial(gameScene);
+    sliderJointMat = new BABYLON.StandardMaterial(gameScene);
+    carMeshMat.alpha = 1;
+    susHolderMat.alpha = 1;
+    susHolderMat.diffuseColor = new BABYLON.Color3(0, 180, 0); //limeGreen
+
+    //car mesh
+    carMesh = BABYLON.MeshBuilder.CreateBox("carMesh", {
+        width: carWidth,
+        height: carHeight,
+        depth: carDepth
+    }, gameScene);
+    carMesh.material = carMeshMat;
+
+    //Wheels
+    fdWheel = BABYLON.MeshBuilder.CreateSphere("fdWheel", wheelDim, gameScene);
+    fpWheel = BABYLON.MeshBuilder.CreateSphere("fpWheel", wheelDim, gameScene);
+    bdWheel = BABYLON.MeshBuilder.CreateSphere("bdWheel", wheelDim, gameScene);
+    bpWheel = BABYLON.MeshBuilder.CreateSphere("bpWheel", wheelDim, gameScene);
+
+    //suspensions holder:
+    fdSusHolder = BABYLON.MeshBuilder.CreateBox("fdSuspension", susHolderSize, gameScene);
+    fpSusHolder = BABYLON.MeshBuilder.CreateBox("fpSuspension", susHolderSize, gameScene);
+    bdSusHolder = BABYLON.MeshBuilder.CreateBox("bdSuspension", susHolderSize, gameScene);
+    bpSusHolder = BABYLON.MeshBuilder.CreateBox("bpSuspension", susHolderSize, gameScene);
+
+    //slider joints
+    /*
+    fdSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
+        mainPivot: new BABYLON.Vector3(carStartingX - carWidth, carStartingY - 20, carStartingZ - carDepth),
+        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
+        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
+        nativeParams: {
+            limit: [0, 0], //Motor limits
+            spring: [100, 2], //Enable springs
+            min: 5, //Minimum distance (suspensions)
+            max: 30 //Maximum distance
+        }
+    });
+    fpSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
+        mainPivot: new BABYLON.Vector3(carStartingX + carWidth, carStartingY - 20, carStartingZ - carDepth),
+        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
+        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
+        nativeParams: {
+            limit: [0, 0], //Motor limits
+            spring: [100, 2], //Enable springs
+            min: 5, //Minimum distance (suspensions)
+            max: 30 //Maximum distance
+        }
+    });
+    bdSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
+        mainPivot: new BABYLON.Vector3(carStartingX - carWidth, carStartingY - 20, carStartingZ + carDepth),
+        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
+        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
+        nativeParams: {
+            limit: [0, 0], //Motor limits
+            spring: [100, 2], //Enable springs
+            min: 5, //Minimum distance (suspensions)
+            max: 30 //Maximum distance
+        }
+    });
+    bpSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
+        mainPivot: new BABYLON.Vector3(carStartingX + carWidth, carStartingY - 20, carStartingZ + carDepth),
+        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
+        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
+        nativeParams: {
+            limit: [0, 0], //Motor limits
+            spring: [100, 2], //Enable springs
+            min: 5, //Minimum distance (suspensions)
+            max: 30 //Maximum distance
+        }
+    });
+    */
+
+    //positioning
+    carMesh.position = new BABYLON.Vector3(carStartingX, carStartingY, carStartingZ);
+
+    fdWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY - (carHeight / 2) - 3, carStartingZ + tireToFront);
+    fpWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY - (carHeight / 2) - 3, carStartingZ + tireToFront);
+    bpWheel.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY - (carHeight / 2) - 3, carStartingZ + tireToBack);
+    bdWheel.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY - (carHeight / 2) - 3, carStartingZ + tireToBack);
+
+    fdSusHolder.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY - (carHeight / 2), carStartingZ + tireToFront);
+    fpSusHolder.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY - (carHeight / 2), carStartingZ + tireToFront);
+    bdSusHolder.position = new BABYLON.Vector3(carStartingX - tireDistance, carStartingY - (carHeight / 2), carStartingZ + tireToBack);
+    bpSusHolder.position = new BABYLON.Vector3(carStartingX + tireDistance, carStartingY - (carHeight / 2), carStartingZ + tireToBack);
+
+    //add physics
     carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.BoxImpostor, carPHYSICS, gameScene);
     [fdWheel, fpWheel, bdWheel, bpWheel].forEach(function(w) {
         w.physicsImpostor = new BABYLON.PhysicsImpostor(w, BABYLON.PhysicsImpostor.SphereImpostor, tirePHYSICS, gameScene);
     });
+
     [fdSusHolder, fpSusHolder, bdSusHolder, bpSusHolder].forEach(function(h) {
-        //h.isVisible = false;
         h.material = susHolderMat;
+        //h.isVisible = false;
         h.physicsImpostor = new BABYLON.PhysicsImpostor(h, BABYLON.PhysicsImpostor.SphereImpostor, susHolderPHYSICS, gameScene);
     });
 
     /*
+    carMesh.physicsImpostor.addJoint(fdSusHolder.physicsImpostor, fdSliderJoint);
+    carMesh.physicsImpostor.addJoint(fpSusHolder.physicsImpostor, fpSliderJoint);
+    carMesh.physicsImpostor.addJoint(bdSusHolder.physicsImpostor, bdSliderJoint);
+    carMesh.physicsImpostor.addJoint(bpSusHolder.physicsImpostor, bpSliderJoint);
     BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
@@ -471,8 +513,6 @@ var addCar = function() {
             car.position = carMesh.getAbsolutePosition();
         });
     */
-
-    //carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.BoxImpostor, carPHYSICS, gameScene);
 };
 
 //Function to remove car
