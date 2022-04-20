@@ -397,6 +397,13 @@ var addCar = function() {
         restitution: 0.5
     };
 
+    var slideJointParams = {
+        limit: [0, 0], //Motor limits
+        spring: [100, 2], //Enable springs
+        min: 5, //Minimum distance (suspensions)
+        max: 30 //Maximum distance
+    };
+
     //var randomStartPosition = Math.random() * 46 - 23;
     overRamp = false;
 
@@ -429,52 +436,68 @@ var addCar = function() {
     bpSusHolder = BABYLON.MeshBuilder.CreateBox("bpSuspension", susHolderSize, gameScene);
 
     //slider joints
-    /*
     fdSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
         mainPivot: new BABYLON.Vector3(carStartingX - carWidth, carStartingY - 20, carStartingZ - carDepth),
-        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
-        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
-        nativeParams: {
-            limit: [0, 0], //Motor limits
-            spring: [100, 2], //Enable springs
-            min: 5, //Minimum distance (suspensions)
-            max: 30 //Maximum distance
-        }
+        mainAxis: new BABYLON.Vector3(0, -1, 0),
+        connectedAxis: new BABYLON.Vector3(0, -1, 0),
+        nativeParams: slideJointParams
     });
     fpSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
         mainPivot: new BABYLON.Vector3(carStartingX + carWidth, carStartingY - 20, carStartingZ - carDepth),
-        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
-        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
-        nativeParams: {
-            limit: [0, 0], //Motor limits
-            spring: [100, 2], //Enable springs
-            min: 5, //Minimum distance (suspensions)
-            max: 30 //Maximum distance
-        }
+        mainAxis: new BABYLON.Vector3(0, -1, 0),
+        connectedAxis: new BABYLON.Vector3(0, -1, 0),
+        nativeParams: slideJointParams
     });
     bdSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
         mainPivot: new BABYLON.Vector3(carStartingX - carWidth, carStartingY - 20, carStartingZ + carDepth),
-        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
-        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
-        nativeParams: {
-            limit: [0, 0], //Motor limits
-            spring: [100, 2], //Enable springs
-            min: 5, //Minimum distance (suspensions)
-            max: 30 //Maximum distance
-        }
+        mainAxis: new BABYLON.Vector3(0, -1, 0),
+        connectedAxis: new BABYLON.Vector3(0, -1, 0),
+        nativeParams: slideJointParams
     });
     bpSliderJoint = new BABYLON.MotorEnabledJoint(BABYLON.PhysicsJoint.SliderJoint, {
         mainPivot: new BABYLON.Vector3(carStartingX + carWidth, carStartingY - 20, carStartingZ + carDepth),
-        mainAxis: new BABYLON.Vector3(0, -1, 0), //The axis on which the slider works, which is the Y axis
-        connectedAxis: new BABYLON.Vector3(0, -1, 0), //The axis connection of the second body and the main one
+        mainAxis: new BABYLON.Vector3(0, -1, 0),
+        connectedAxis: new BABYLON.Vector3(0, -1, 0),
+        nativeParams: slideJointParams
+    });
+
+    //wheel joints
+    var joint1 = new BABYLON.HingeJoint({
+        mainPivot: new BABYLON.Vector3(carStartingX, carStartingY - 20, carStartingZ),
+        connectedPivot: new BABYLON.Vector3(carStartingX + 30, carStartingY, carStartingZ),
+        mainAxis: new BABYLON.Vector3(-1, 0, 0),
+        connectedAxis: new BABYLON.Vector3(-1, 0, 0),
         nativeParams: {
-            limit: [0, 0], //Motor limits
-            spring: [100, 2], //Enable springs
-            min: 5, //Minimum distance (suspensions)
-            max: 30 //Maximum distance
+            limit: [0, 0]
         }
     });
-    */
+    var joint2 = new BABYLON.HingeJoint({
+        mainPivot: new BABYLON.Vector3(carStartingX, carStartingY - 20, carStartingZ),
+        connectedPivot: new BABYLON.Vector3(carStartingX + 30, carStartingY, carStartingZ),
+        mainAxis: new BABYLON.Vector3(-1, 0, 0),
+        connectedAxis: new BABYLON.Vector3(-1, 0, 0),
+        nativeParams: {
+            limit: [0, 0]
+        }
+    });
+    var joint3 = new BABYLON.HingeJoint({
+        mainPivot: new BABYLON.Vector3(carStartingX, carStartingY - 20, carStartingZ),
+        connectedPivot: new BABYLON.Vector3(carStartingX + 30, carStartingY, carStartingZ),
+        mainAxis: new BABYLON.Vector3(-1, 0, 0),
+        connectedAxis: new BABYLON.Vector3(-1, 0, 0),
+        nativeParams: {
+            limit: [0, 0]
+        }
+    });
+    var joint4 = new BABYLON.HingeJoint({
+        mainPivot: new BABYLON.Vector3(carStartingX, carStartingY - 20, carStartingZ),
+        connectedPivot: new BABYLON.Vector3(carStartingX + 30, carStartingY, carStartingZ),
+        mainAxis: new BABYLON.Vector3(-1, 0, 0),
+        connectedAxis: new BABYLON.Vector3(-1, 0, 0),
+        nativeParams: {
+            limit: [0, 0]
+        }
+    });
 
     //positioning
     carMesh.position = new BABYLON.Vector3(carStartingX, carStartingY, carStartingZ);
@@ -501,11 +524,21 @@ var addCar = function() {
         h.physicsImpostor = new BABYLON.PhysicsImpostor(h, BABYLON.PhysicsImpostor.SphereImpostor, susHolderPHYSICS, gameScene);
     });
 
-    /*
+
     carMesh.physicsImpostor.addJoint(fdSusHolder.physicsImpostor, fdSliderJoint);
     carMesh.physicsImpostor.addJoint(fpSusHolder.physicsImpostor, fpSliderJoint);
     carMesh.physicsImpostor.addJoint(bdSusHolder.physicsImpostor, bdSliderJoint);
+
+    fdSusHolder.physicsImpostor.addJoint(fdWheel.physicsImpostor, joint1);
+    fpSusHolder.physicsImpostor.addJoint(fpWheel.physicsImpostor, joint2);
+    bdSusHolder.physicsImpostor.addJoint(bdWheel.physicsImpostor, joint3);
+    /* 
     carMesh.physicsImpostor.addJoint(bpSusHolder.physicsImpostor, bpSliderJoint);
+    bpSusHolder.physicsImpostor.addJoint(bpWheel.physicsImpostor, joint4);
+    */
+
+
+    /*
     BABYLON.SceneLoader.ImportMesh("Car", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/car.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
