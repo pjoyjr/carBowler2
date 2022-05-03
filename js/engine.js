@@ -385,7 +385,7 @@ var addCar = function() {
 
 
     //load in car from blender
-    BABYLON.SceneLoader.ImportMesh("Cube", "", "https://raw.githubusercontent.com/pjoyjr/carBowling/master/obj/model3.babylon", gameScene,
+    BABYLON.SceneLoader.ImportMesh("Cube", "", "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
             car.scaling = new BABYLON.Vector3(3, 3, 5);
