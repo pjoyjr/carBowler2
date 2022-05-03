@@ -68,7 +68,7 @@ var pinMesh, pinMeshAlpha = 0;
 var speed = 0;
 var accel = .2;
 var decel = -.35;
-var MAXSPEED = 14;
+var MAXSPEED = 120;
 var carMoved = false;
 
 //physics info for pins and car
@@ -371,12 +371,12 @@ var addStationaryObjects = function() {
 //Function to add car to scene
 var addCar = function() {
     var carMeshMat;
-    var carMeshAlpha = 0;
+    var carMeshAlpha = 1;
     var randomStartPosition = Math.random() * 46 - 23;
 
     overRamp = false;
     //create bounding box for physics engine
-    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 10.0 }, gameScene);
+    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, gameScene);
     carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
     carMeshMat = new BABYLON.StandardMaterial(gameScene);
     carMeshMat.alpha = carMeshAlpha;
@@ -388,7 +388,7 @@ var addCar = function() {
     BABYLON.SceneLoader.ImportMesh("Cube", "", "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon", gameScene,
         function(newMeshes) {
             car = newMeshes[0];
-            car.scaling = new BABYLON.Vector3(3, 3, 5);
+            car.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
             //car.position = new BABYLON.Vector3(0, 16, -180);
             car.position = carMesh.getAbsolutePosition();
         });
@@ -720,6 +720,7 @@ var calculateScore = function() {
 
 var setupForThrow = function() {
     addCar();
+    speed = 0;
     cam.position = new BABYLON.Vector3(0, 40, -250);
     cam.lockedTarget = carMesh.getAbsolutePosition();
     setupPins(pinStanding);
