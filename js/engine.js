@@ -68,7 +68,7 @@ var pinMesh, pinMeshAlpha = 0;
 var speed = 0;
 var accel = .2;
 var decel = -.35;
-var MAXSPEED = 120;
+var MAXSPEED = 17;
 var carMoved = false;
 
 //physics info for pins and car
