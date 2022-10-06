@@ -26,8 +26,7 @@ var car, carMesh;
 
 //game and score variables
 var gameGUI;
-var frameGUI, scoreGUI, speedGUI, score2GUI, fpsGUI;
-var fps = 0;
+var frameGUI, scoreGUI, speedGUI, score2GUI;
 var overRamp = false; //for checking to see if user can alter car
 var isSetup = false; // for setting up pins
 var map = {}; //object for multiple key presses
@@ -68,7 +67,7 @@ var pinMesh, pinMeshAlpha = 0;
 var speed = 0;
 var accel = .2;
 var decel = -.35;
-var MAXSPEED = 17;
+var MAXSPEED = 12;
 var carMoved = false;
 
 //physics info for pins and car
@@ -218,13 +217,11 @@ var createGameGUI = function() {
     frameGUI = BABYLON.GUI.Button.CreateSimpleButton("frameGUI", "");
     speedGUI = BABYLON.GUI.Button.CreateSimpleButton("speedGUI", "");
     score2GUI = BABYLON.GUI.Button.CreateSimpleButton("score2GUI", "");
-    fpsGUI = BABYLON.GUI.Button.CreateSimpleButton("score2GUI", "");
 
     formatBtn(scoreGUI);
     formatBtn(frameGUI);
     formatBtn(speedGUI);
     formatBtn(score2GUI);
-    formatBtn(fpsGUI);
 
     frameGUI.textBlock.text = "Frame:";
     frameGUI.top = "-45%";
@@ -254,18 +251,11 @@ var createGameGUI = function() {
     score2GUI.width = "20%";
     score2GUI.textBlock.fontSize = 24;
 
-    fpsGUI.textBlock.text = "FPS:";
-    fpsGUI.top = "-25%";
-    fpsGUI.left = "40%";
-    fpsGUI.height = "5%";
-    fpsGUI.width = "20%";
-    fpsGUI.textBlock.fontSize = 24;
 
     gameGUI.addControl(frameGUI);
     gameGUI.addControl(scoreGUI);
     gameGUI.addControl(speedGUI);
     gameGUI.addControl(score2GUI);
-    gameGUI.addControl(fpsGUI);
 };
 
 //Function to add all non moving objects to scene
@@ -614,24 +604,6 @@ var updateGUI = function() {
     scoreGUI.textBlock.text = "Score: " + score;
     speedGUI.textBlock.text = "Speed: " + speed.toFixed(2);
     score2GUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
-
-
-    /* FOR TESTING */
-    const fpsElem = document.querySelector("#fps");
-
-    let then = 0;
-
-    function render(now) {
-        now *= 0.001; // convert to seconds
-        const deltaTime = now - then; // compute time since last frame
-        then = now; // remember time for next frame
-        const fps = 1 / deltaTime; // compute frames per second
-        fpsElem.textContent = fps.toFixed(1); // update fps display
-        requestAnimationFrame(render);
-    }
-
-    requestAnimationFrame(render);
-    fpsGUI.textBlock.text = "FPS: ";
 };
 
 var countStandingPins = function() {
