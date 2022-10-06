@@ -32,12 +32,41 @@ class Car {
         return this.mesh;
     }
 
-    setMesh(newMesh){
-        {}
+    getMeshPosition(){
+        return this.mesh.getAbsolutePosition();
+    }
+    
+    getMeshPositionZ(){
+        return this.mesh.getAbsolutePosition().z;
     }
 
     removeCar(){
         this.mesh.dispose();
         this.car.dispose();
+    }
+
+    allowDriving() {
+        if (map["w"] || map["W"]) {
+            this.moved = true;
+            speed += accel;
+            if (speed > MAXSPEED)
+                speed = MAXSPEED;
+            if (speed < 0)
+                speed = 0;
+            var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+            this.getMesh.applyImpulse(ImpulseVector, this.getMeshPosition); //impulse at center of mass;
+        } else if (((speed + decel) > 0) && this.moved) {
+            speed += decel;
+            var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+            this.getMesh.applyImpulse(ImpulseVector, this.getMeshPosition); //impulse at center of mass;
+        }
+        if (map["a"] || map["A"]) {
+            if (this.getMeshPosition.x > -32)
+                this.getMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+        }
+        if (map["d"] || map["D"]) {
+            if (this.getMeshPosition.x < 32)
+                this.getMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+        }
     }
 }

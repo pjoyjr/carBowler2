@@ -27,7 +27,6 @@ var car;
 //game and score variables
 var gameGUI;
 var frameGUI, scoreGUI, speedGUI, score2GUI;
-var overRamp = false; //for checking to see if user can alter car
 var isSetup = false; // for setting up pins
 var map = {}; //object for multiple key presses
 
@@ -68,7 +67,6 @@ var speed = 0;
 var accel = .2;
 var decel = -.35;
 var MAXSPEED = 12;
-var carMoved = false;
 
 //physics info for pins and car
 var pinPHYSICS = { mass: 3, restitution: 0.0 };
@@ -532,35 +530,6 @@ var addController = function() {
         }));
 };
 
-
-// var addCarMechanics = function(car) {
-//     var carMesh = car.mesh
-//     if (map["w"] || map["W"]) {
-//         car.setMoved(true)
-//         speed += accel;
-//         if (speed > MAXSPEED)
-//             speed = MAXSPEED;
-//         if (speed < 0)
-//             speed = 0;
-//         var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
-//         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
-//     } else if (((speed + decel) > 0) && carMoved) {
-//         speed += decel;
-//         var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
-//         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
-//     }
-//     if (map["a"] || map["A"]) {
-//         if (carMesh.getAbsolutePosition().x > -32)
-//             carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-//     }
-
-//     if (map["d"] || map["D"]) {
-//         if (carMesh.getAbsolutePosition().x < 32)
-//             carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
-//     }
-
-// };
-
 var updateGUI = function() {
     if (topFrame) {
         frameGUI.textBlock.text = "Top " + frameNum;
@@ -656,11 +625,11 @@ var calculateScore = function() {
     }
 };
 
-var setupForThrow = function(car) {
+var setupForThrow = function() {
     car = new Car(gameScene)
     speed = 0;
     cam.position = new BABYLON.Vector3(0, 40, -250);
-    cam.lockedTarget = car.getMesh().getAbsolutePosition();
+    cam.lockedTarget = car.getMeshPosition();
     setupPins(pinStanding);
     isSetup = true;
 };
@@ -720,30 +689,30 @@ var resetVariables = function() {
     isSetup = false;
 };
 
-var addGameLogic = function(car) {
+var addGameLogic = function() {
     addController();
     if (testingBOOL)
         pass;
     else
         resetVariables();
 
-    gameScene.registerAfterRender(function(car) {
+    gameScene.registerAfterRender(function() {
         updateGUI();
 
         if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
             gameOver = true;
 
         if (!isSetup && !gameOver)
-            setupForThrow(car);
+            setupForThrow();
 
-        // if (car.getMesh().getAbsolutePosition().z > 25 && !overRamp && isSetup) {
-        //     overRamp = true;
-        //     startTimer = new Date();
-        // }
-        if (!overRamp) {
-            {}
-            //addCarMechanics();
-        } else if (!gameOver) { // wait till timer is done then count pins
+        if (car.getMeshPositionZ > 25 && !car.overRamp && isSetup) {
+            car.overRamp = true;
+            startTimer = new Date();
+        }
+        if(!car.overRamp){
+            car.allowDriving
+        }
+        else if (!gameOver) { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
@@ -759,7 +728,7 @@ var addGameLogic = function(car) {
     });
 };
 
-var createGameScene = function(car) {
+var createGameScene = function() {
 
     gameScene = new BABYLON.Scene(engine);
 
@@ -780,7 +749,7 @@ var createGameScene = function(car) {
     
     createGameGUI();
     addStationaryObjects();
-    addGameLogic(car);
+    addGameLogic();
     
 
     return gameScene;
@@ -790,7 +759,7 @@ var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, ste
 
 var activeScene = createMainMenuScene();
 
-engine.runRenderLoop(function(car) {
+engine.runRenderLoop(function() {
     activeScene.render();
     if (state != currScene) {
         state = currScene;
@@ -802,7 +771,7 @@ engine.runRenderLoop(function(car) {
                 activeScene = createCarSelectScene();
                 break;
             case 2:
-                activeScene = createGameScene(car);
+                activeScene = createGameScene();
                 break;
         }
     }
