@@ -21,7 +21,7 @@ var car1Angle = 210,
 var pill, cube, cone;
 var carsArray = [pill, cube, cone];
 
-var car, carMesh;
+var car;
 
 
 //game and score variables
@@ -72,7 +72,6 @@ var carMoved = false;
 
 //physics info for pins and car
 var pinPHYSICS = { mass: 3, restitution: 0.0 };
-var carPHYSICS = { mass: 10, restitution: 0.0 };
 
 var degToRadians = function(degrees) {
     var radians = degrees * Math.PI / 180;
@@ -358,41 +357,6 @@ var addStationaryObjects = function() {
     rampMesh.physicsImpostor = new BABYLON.PhysicsImpostor(rampMesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, gameScene);
 };
 
-//Function to add car to scene
-var addCar = function() {
-    var carMeshMat;
-    var carMeshAlpha = 1;
-    var randomStartPosition = Math.random() * 46 - 23;
-
-    overRamp = false;
-    //create bounding box for physics engine
-    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, gameScene);
-    carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-    carMeshMat = new BABYLON.StandardMaterial(gameScene);
-    carMeshMat.alpha = carMeshAlpha;
-    carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
-    carMesh.material = carMeshMat;
-
-
-    //load in car from blender
-    BABYLON.SceneLoader.ImportMesh("Cube", "", "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon", gameScene,
-        function(newMeshes) {
-            car = newMeshes[0];
-            car.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
-            //car.position = new BABYLON.Vector3(0, 16, -180);
-            car.position = carMesh.getAbsolutePosition();
-        });
-
-    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
-    carMoved = false;
-};
-
-//Function to remove car
-var rmCar = function() {
-    carMesh.dispose();
-    car.dispose(); //TODO ENABLE WITH BLENDERIMPORT
-};
-
 //Function to add all pins for next bowl
 var setupPins = function(pinsStanding) {
     //CREATE FAKE PIN COLLISION BOUNDS
@@ -568,32 +532,34 @@ var addController = function() {
         }));
 };
 
-var addCarMechanics = function() {
-    if (map["w"] || map["W"]) {
-        carMoved = true;
-        speed += accel;
-        if (speed > MAXSPEED)
-            speed = MAXSPEED;
-        if (speed < 0)
-            speed = 0;
-        var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
-        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
-    } else if (((speed + decel) > 0) && carMoved) {
-        speed += decel;
-        var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
-        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
-    }
-    if (map["a"] || map["A"]) {
-        if (carMesh.getAbsolutePosition().x > -32)
-            carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-    }
 
-    if (map["d"] || map["D"]) {
-        if (carMesh.getAbsolutePosition().x < 32)
-            carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
-    }
+// var addCarMechanics = function(car) {
+//     var carMesh = car.mesh
+//     if (map["w"] || map["W"]) {
+//         car.setMoved(true)
+//         speed += accel;
+//         if (speed > MAXSPEED)
+//             speed = MAXSPEED;
+//         if (speed < 0)
+//             speed = 0;
+//         var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+//         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
+//     } else if (((speed + decel) > 0) && carMoved) {
+//         speed += decel;
+//         var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+//         carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
+//     }
+//     if (map["a"] || map["A"]) {
+//         if (carMesh.getAbsolutePosition().x > -32)
+//             carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+//     }
 
-};
+//     if (map["d"] || map["D"]) {
+//         if (carMesh.getAbsolutePosition().x < 32)
+//             carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+//     }
+
+// };
 
 var updateGUI = function() {
     if (topFrame) {
@@ -690,18 +656,18 @@ var calculateScore = function() {
     }
 };
 
-var setupForThrow = function() {
-    addCar();
+var setupForThrow = function(car) {
+    car = new Car(gameScene)
     speed = 0;
     cam.position = new BABYLON.Vector3(0, 40, -250);
-    cam.lockedTarget = carMesh.getAbsolutePosition();
+    cam.lockedTarget = car.getMesh().getAbsolutePosition();
     setupPins(pinStanding);
     isSetup = true;
 };
 
 var cleanupFrame = function() {
     countStandingPins();
-    rmCar();
+    car.removeCar()
     cleanupPins();
 };
 
@@ -754,28 +720,29 @@ var resetVariables = function() {
     isSetup = false;
 };
 
-var addGameLogic = function() {
+var addGameLogic = function(car) {
     addController();
     if (testingBOOL)
         pass;
     else
         resetVariables();
 
-    gameScene.registerAfterRender(function() {
+    gameScene.registerAfterRender(function(car) {
         updateGUI();
 
         if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
             gameOver = true;
 
         if (!isSetup && !gameOver)
-            setupForThrow();
+            setupForThrow(car);
 
-        if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
-            overRamp = true;
-            startTimer = new Date();
-        }
+        // if (car.getMesh().getAbsolutePosition().z > 25 && !overRamp && isSetup) {
+        //     overRamp = true;
+        //     startTimer = new Date();
+        // }
         if (!overRamp) {
-            addCarMechanics();
+            {}
+            //addCarMechanics();
         } else if (!gameOver) { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
@@ -792,7 +759,7 @@ var addGameLogic = function() {
     });
 };
 
-var createGameScene = function() {
+var createGameScene = function(car) {
 
     gameScene = new BABYLON.Scene(engine);
 
@@ -805,15 +772,16 @@ var createGameScene = function() {
 
     light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 50, 0), gameScene);
     light.intensity = .7;
-
+    
     //CREATE PHYSICS ENGINE
     var forceVector = new BABYLON.Vector3(0, -60, 0);
     var physicsPlugin = new BABYLON.CannonJSPlugin();
     gameScene.enablePhysics(forceVector, physicsPlugin);
-
+    
     createGameGUI();
     addStationaryObjects();
-    addGameLogic();
+    addGameLogic(car);
+    
 
     return gameScene;
 };
@@ -822,7 +790,7 @@ var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, ste
 
 var activeScene = createMainMenuScene();
 
-engine.runRenderLoop(function() {
+engine.runRenderLoop(function(car) {
     activeScene.render();
     if (state != currScene) {
         state = currScene;
@@ -834,7 +802,7 @@ engine.runRenderLoop(function() {
                 activeScene = createCarSelectScene();
                 break;
             case 2:
-                activeScene = createGameScene();
+                activeScene = createGameScene(car);
                 break;
         }
     }
