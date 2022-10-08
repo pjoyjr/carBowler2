@@ -1,51 +1,19 @@
-var createGameGUI = function() {
-    var gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+//game and score variables
+var map = {}; //object for multiple key presses
 
-    var scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("scoreGUI", "");
-    var frameGUI = BABYLON.GUI.Button.CreateSimpleButton("frameGUI", "");
-    var speedGUI = BABYLON.GUI.Button.CreateSimpleButton("speedGUI", "");
-    var score2GUI = BABYLON.GUI.Button.CreateSimpleButton("score2GUI", "");
+var gameOver = false;
+var extraFrame = false;
+var startTimer, endTimer;
 
-    formatBtn(scoreGUI);
-    formatBtn(frameGUI);
-    formatBtn(speedGUI);
-    formatBtn(score2GUI);
+var topFrame = true;
+var frameNum = 1;
+var scorecard = [];
+var score = 0;
+var oneThrowAgo = 0; //for spare/strike calculation
+var twoThrowAgo = 0; //for spare/strike calculation
+var threeThrowAgo = 0; //for spare/strike calculation
+var scoreGUI, frameGUI, speedGUI, lastBowlGUI;
 
-    frameGUI.textBlock.text = "Frame:";
-    frameGUI.top = "-45%";
-    frameGUI.left = "40%";
-    frameGUI.height = "5%";
-    frameGUI.width = "20%";
-    frameGUI.textBlock.fontSize = 24;
-
-    scoreGUI.textBlock.text = "Score:";
-    scoreGUI.top = "-40%";
-    scoreGUI.left = "40%";
-    scoreGUI.height = "5%";
-    scoreGUI.width = "20%";
-    scoreGUI.textBlock.fontSize = 24;
-
-    speedGUI.textBlock.text = "Speed:";
-    speedGUI.top = "-35%";
-    speedGUI.left = "40%";
-    speedGUI.height = "5%";
-    speedGUI.width = "20%";
-    speedGUI.textBlock.fontSize = 24;
-
-    score2GUI.textBlock.text = "Last Bowl:";
-    score2GUI.top = "-30%";
-    score2GUI.left = "40%";
-    score2GUI.height = "5%";
-    score2GUI.width = "20%";
-    score2GUI.textBlock.fontSize = 24;
-
-    gameGUI.addControl(frameGUI);
-    gameGUI.addControl(scoreGUI);
-    gameGUI.addControl(speedGUI);
-    gameGUI.addControl(score2GUI);
-};
-
-//Add action manager for input
 var addController = function() {
     gameScene.actionManager = new BABYLON.ActionManager(gameScene);
     gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
@@ -56,6 +24,26 @@ var addController = function() {
         function(evt) {
             map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
+};
+
+var createGameGUI = function() {
+    var gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+
+    let guis = [scoreGUI, frameGUI, speedGUI, lastBowlGUI]
+    let guisName = ["Frame:","Score:","Speed:","Last Bowl:"]
+    let guisTop = ["-45%","-40%","-35%","-30%"]
+
+    for(var i = 0; i < 4; i++){
+        guis[i] = BABYLON.GUI.Button.CreateSimpleButton("", "");
+        formatBtn(guis[i]);
+        guis[i].textBlock.text= guisName[i];
+        guis[i].top = guisTop[i];
+        guis[i].left = "40%";
+        guis[i].height = "5%";
+        guis[i].width = "20%";
+        guis[i].textBlock.fontSize = 24;
+        gameGUI.addControl(guis[i]);
+    }
 };
 
 var addGameLogic = function(pins, car, environment) {
@@ -118,22 +106,6 @@ var addGameLogic = function(pins, car, environment) {
     //     }
     // });
 };
-
-
-//game and score variables
-var map = {}; //object for multiple key presses
-
-var gameOver = false;
-var extraFrame = false;
-var startTimer, endTimer;
-
-var topFrame = true;
-var frameNum = 1;
-var scorecard = [];
-var score = 0;
-var oneThrowAgo = 0; //for spare/strike calculation
-var twoThrowAgo = 0; //for spare/strike calculation
-var threeThrowAgo = 0; //for spare/strike calculation
 
 var manageFrames = function() {
     if (topFrame && pins.currBowlCount == 10 && frameNum < 10) { //strike on top of frame
@@ -209,20 +181,17 @@ var calculateScore = function() {
 };
 
 var endGame = function() {
-    //DISPLAY SCORE AND RETURN TO MAIN MENU AFTER CONFIRMING
     frameGUI.dispose();
     scoreGUI.dispose();
     speedGUI.dispose();
     score2GUI.dispose();
     
     //end game gui
-    var resetBtn;
+    let resetBtn;
 
     gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
-
     scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", "");
     formatBtn(scoreGUI);
-
     scoreGUI.textBlock.text = "Score: " + score;
     scoreGUI.fontSize = 48;
     scoreGUI.height = "15%";
