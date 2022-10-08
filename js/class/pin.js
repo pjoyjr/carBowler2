@@ -8,7 +8,6 @@ const PIN_URL = "obj/pin.babylon";
 class Pin{
     constructor(gameScene, index){
         var pin = this.createMesh(gameScene, index);
-        console.log(pin);
         this.mesh = pin[0];
         this.imposter = pin[1];
     }
@@ -52,13 +51,11 @@ class Pin{
                         break;
                 }
                 imposter.material = new BABYLON.StandardMaterial(gameScene);
-                
                 imposter.isVisible = false;
                 imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.CylinderImpostor, PIN_PHYSICS, gameScene);
                 mesh = newMeshes[0];
                 mesh.scaling = PIN_SCALING;
                 mesh.parent = imposter;
-                
             }
         );
         return [mesh, imposter];
