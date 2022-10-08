@@ -1,6 +1,6 @@
 class Pins{
     constructor(gameScene){
-        this.pins = [];
+        this.pins = [Pin];
         for (var i = 0; i < 10; i = i + 1) {
             let pin = new Pin(gameScene, i);
             this.pins.push(pin);
@@ -33,7 +33,7 @@ class Pins{
 
     cleanupFrame(){
         this.countStanding();
-        for(var pin in this.pins){
+        for(let pin in this.pins){
             pin.dispose()
         }
     }

@@ -7,17 +7,19 @@ const PIN_URL = "obj/pin.babylon";
 
 class Pin{
     constructor(gameScene, index){
-        var pin = this.createMesh(gameScene, index);
-        this.mesh = pin[0];
-        this.imposter = pin[1];
+        this.material = new BABYLON.StandardMaterial(gameScene);
+        this.createMesh(gameScene, index);
     }
     
+
+
     createMesh(gameScene, index){
         var imposter = "";
         var mesh = "";
+        let material = this.material
         BABYLON.SceneLoader.ImportMesh("Pin", "", PIN_URL, gameScene,
             function(newMeshes) {
-                imposter = new BABYLON.MeshBuilder.CreateCylinder("imposter", PIN_DIM, gameScene);
+                imposter = new BABYLON.MeshBuilder.CreateCylinder(`imposter${index}`, PIN_DIM, gameScene);
                 switch (index) {
                     case 0:
                         imposter.position = new BABYLON.Vector3(0, PIN_HEIGHT, 148);
@@ -50,7 +52,7 @@ class Pin{
                         imposter.position = new BABYLON.Vector3(22.5, PIN_HEIGHT, 193);
                         break;
                 }
-                imposter.material = new BABYLON.StandardMaterial(gameScene);
+                imposter.material = material;
                 imposter.isVisible = false;
                 imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.CylinderImpostor, PIN_PHYSICS, gameScene);
                 mesh = newMeshes[0];
@@ -58,6 +60,8 @@ class Pin{
                 mesh.parent = imposter;
             }
         );
+        this.mesh = mesh;
+        this.imposter = imposter;
         return [mesh, imposter];
     }
             
