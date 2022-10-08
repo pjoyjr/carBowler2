@@ -11,8 +11,6 @@ class Pin{
         this.createMesh(gameScene, index);
     }
     
-
-
     createMesh(gameScene, index){
         var imposter = "";
         var mesh = "";
@@ -64,12 +62,7 @@ class Pin{
         this.imposter = imposter;
         return [mesh, imposter];
     }
-            
-    dispose(){
-        this.imposter.dispose();
-        this.mesh.dispose();
-    }
-            
+
     isStanding(){
         if (this.imposter.getAbsolutePosition().y < 50.5 || this.imposter.getAbsolutePosition().y > 51.5)
             return false;

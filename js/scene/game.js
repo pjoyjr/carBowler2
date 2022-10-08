@@ -44,15 +44,18 @@ var addLogic = function() {
            // pins.cleanupFrame();
             // pins.isSetup = true;
         // }
-        if (!gameOver && car.overRamp) { // wait till timer is done then count pins
-            let startTimer = new Date();
+        var startTimer = 0;
+        if (!car.overRamp){
+            car.allowDriving();
+            startTimer = new Date();
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
+        }else if (!gameOver && car.overRamp) { // wait till timer is done then count pins
             let endTimer = new Date();
             if ((endTimer - startTimer) >= 7000) {
                 //Count pins knocked over after 7w secs
                 //pins.cleanupFrame();
-                car.reset()
+                //reset car position and moved=false?
                 //MANAGE FRAMES
                 if (topFrame && pins.currBowlCount == 10 && frameNum < 10) { //strike on top of frame
                     scorecard.push("-");

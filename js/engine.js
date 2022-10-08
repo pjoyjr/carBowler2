@@ -1,9 +1,3 @@
-/*
-	for Vector3(x,z,y)
-	x-axis refers to perpendicular to lane
-	z-axis refers to normal to lane
-	y-axis refers to parallel to lane
-*/
 
 const canvas = document.getElementById("renderCanvas");
 var gameScene, cam, light;
