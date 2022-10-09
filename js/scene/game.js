@@ -205,7 +205,8 @@ var addLogic = function() {
             gameOver = true;
 
         if (!isSetup && !gameOver){
-            console.log("SETTING UP PINS!")
+            car.imposter.dispose();
+            car.imposter = car.createImposter();
             car.reset();
             pins.setup();
             isSetup = true;

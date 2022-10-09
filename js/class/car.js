@@ -1,50 +1,19 @@
 //const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
 const CAR_MODEL_URL = "obj/model3.babylon";
-const CAR_PHYSICS = { mass: 1, restitution: 0.0, friction: 1 };
+const CAR_PHYSICS = { mass: 10, restitution: 0.0};
 
-const ACCEL = .02;
-const DECEL = -.00035;
-const MAXSPEED = 1;
-const CAR_IMPOSTER_ALPHA = 1;
-const CAR_MESH_ALPHA = 0;
+const ACCEL = .2;
+const DECEL = -.35;
+const MAXSPEED = 12;
+const CAR_IMPOSTER_ALPHA = 0;
+const CAR_MESH_ALPHA = 1;
 var map = {};
 
 class Car {
     constructor(_gameScene) {
         //create imposter
         this.gameScene = _gameScene;
-        let imposter;
-        let randomStartPosition = Math.random() * 46 - 23;
-        let imposterMaterial = new BABYLON.StandardMaterial(_gameScene);
-        imposterMaterial.alpha = CAR_IMPOSTER_ALPHA;
-        //imposterMaterial.diffuseColor = new BABYLON.Color3(0, 180, 0);
-
-        imposter = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, _gameScene);
-        imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-        var colors = imposter.getVerticesData(BABYLON.VertexBuffer.ColorKind);
-        if(!colors) {
-            colors = [];
-            var positions = imposter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-            for(var p = 0; p < positions.length / 3; p++) {
-                colors.push(Math.random(), Math.random(), Math.random(), 1);
-            }
-        }
-        imposter.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
-
-        //imposter.material = imposterMaterial;
-        this.imposter = imposter;
-        
-        //create mesh
-        let mesh;
-        let meshMaterial = new BABYLON.StandardMaterial(_gameScene);
-        meshMaterial.alpha = CAR_MESH_ALPHA;
-        BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, _gameScene,
-        function(newMeshes) {
-            mesh = newMeshes[0];
-            mesh.material = meshMaterial;
-            mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
-            mesh.position = imposter.getAbsolutePosition();});
-        this.mesh = mesh;
+        this.imposter = this.createImposter();
 
         this.imposter.physicsImpostor = new BABYLON.PhysicsImpostor(this.imposter, BABYLON.PhysicsImpostor.SphereImpostor, CAR_PHYSICS, _gameScene);
         cam.position = new BABYLON.Vector3(0, 40, -250);
@@ -57,12 +26,40 @@ class Car {
         this.maxSpeed = MAXSPEED;
         this.addController(_gameScene);
     }
+    createImposter(){
+        let imposter;
+        let randomStartPosition = Math.random() * 46 - 23;
+        let imposterMaterial = new BABYLON.StandardMaterial(this.gameScene);
+        imposterMaterial.alpha = CAR_IMPOSTER_ALPHA;
+        //imposterMaterial.diffuseColor = new BABYLON.Color3(0, 180, 0);
+
+        imposter = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, this.gameScene);
+        imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+        var colors = imposter.getVerticesData(BABYLON.VertexBuffer.ColorKind);
+        if(!colors) {
+            colors = [];
+            var positions = imposter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+            for(var p = 0; p < positions.length / 3; p++) {
+                colors.push(Math.random(), Math.random(), Math.random(), 1);
+            }
+        }
+        imposter.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
+        imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.SphereImpostor, CAR_PHYSICS, this.gameScene);
+
+        
+        //create mesh
+        let mesh;
+        BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, this.gameScene,
+        function(newMeshes) {
+            mesh = newMeshes[0];
+            mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
+            mesh.position = imposter.getAbsolutePosition();});
+        //imposter.material = imposterMaterial;
+        return imposter;
+    }
 
     reset(){
-        // this.imposter.dispose();
-        // this.mesh.dispose();
         // this.imposter = this.createImposter();
-        // this.mesh = this.createMesh();
         let randomStartPosition = Math.random() * 46 - 23;
         this.imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
         //this.imposter.physicsImpostor = new BABYLON.PhysicsImpostor(this.imposter, BABYLON.PhysicsImpostor.SphereImpostor, CAR_PHYSICS,this.gameScene);

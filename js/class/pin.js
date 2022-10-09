@@ -1,4 +1,4 @@
-const PIN_PHYSICS = { mass: .5, restitution: 0.0 };
+const PIN_PHYSICS = { mass: 3, restitution: 0.0 };
 const PIN_DIM = { height: 30, diameterTop: 5, diameterBottom: 9, tessellation: 12 };
 const PIN_HEIGHT = 49;
 const PIN_SCALING = new BABYLON.Vector3(5, 5, 5);
