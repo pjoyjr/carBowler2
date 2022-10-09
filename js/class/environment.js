@@ -10,7 +10,7 @@ var ISLAND_MAT_ALPHA = 1; //leave at 1
 
 class Environment{
     constructor(gameScene){
-        this.islandMesh = ""
+        this.islandMesh = "";
         this.addStationaryObjects(gameScene);
     }
 

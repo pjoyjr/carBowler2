@@ -4,6 +4,8 @@
 	z-axis refers to normal to lane
 	y-axis refers to parallel to lane
 */
+var startTimer;
+
 var addLogic = function() {
     let score = 0, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
     let gameOver = false, extraFrame = false;
@@ -11,12 +13,13 @@ var addLogic = function() {
     let environment = new Environment(gameScene)
     let pins = new Pins(gameScene)
     let car = new Car(gameScene);
-    
-    let scoreGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    let frameGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    let speedGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    let lastBowlGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+    let isSetup = false;
+    var scoreGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+    var frameGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+    var speedGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+    var lastBowlGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
     var gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+    var overRamp = false;
 
     let guis = [scoreGUI, frameGUI, speedGUI, lastBowlGUI]
     let guisName = ["Frame:","Score:","Speed:","Last Bowl:"]
@@ -35,118 +38,6 @@ var addLogic = function() {
     }
 
     gameScene.registerAfterRender(function() {
-        // if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
-        //     gameOver = true;
-
-        //if (!pins.isSetup && !gameOver){
-            // car.resetPosition();
-            // speed = 0;
-           // pins.cleanupFrame();
-            // pins.isSetup = true;
-        // }
-        var startTimer = 0;
-        if (!car.overRamp){
-            car.allowDriving();
-            startTimer = new Date();
-            cam.position = new BABYLON.Vector3(-45, 120, -20);
-            cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
-        }else if (!gameOver && car.overRamp) { // wait till timer is done then count pins
-            let endTimer = new Date();
-            if ((endTimer - startTimer) >= 7000) {
-                //Count pins knocked over after 7w secs
-                //pins.cleanupFrame();
-                //reset car position and moved=false?
-                //MANAGE FRAMES
-                if (topFrame && pins.currBowlCount == 10 && frameNum < 10) { //strike on top of frame
-                    scorecard.push("-");
-                    scorecard.push("X");
-                } else if (!topFrame && (pins.currBowlCount + oneThrowAgo[0] == 10) && frameNum < 10) {
-                    scorecard.push("/");
-                } else if (frameNum < 10) {
-                    scorecard.push(pins.currBowlCount);
-                } else if (scorecard.length == 18) { //top of 10th frame
-                    if (pins.currBowlCount == 10) {
-                        extraFrame = true;
-                        scorecard.push("X");
-                    } else {
-                        scorecard.push(pins.currBowlCount);
-                    }
-                } else if (scorecard.length == 19) { //bottom of 10th frame
-                    if (pins.currBowlCount == 10 && oneThrowAgo[0] == 10) {
-                        scorecard.push("X");
-                        extraFrame = true;
-                    } else if ((pins.currBowlCount + oneThrowAgo[0]) == 10) {
-                        scorecard.push("/");
-                        extraFrame = true;
-                    } else {
-                        scorecard.push(pins.currBowlCount);
-                    }
-                } else if (scorecard.length == 20) { //extra frame
-                    if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && pins.currBowlCount == 10) {
-                        scorecard.push("X");
-                        extraFrame = true;
-                    } else if ((pins.currBowlCount + oneThrowAgo[0]) == 10) {
-                        scorecard.push("/");
-                        extraFrame = true;
-                    } else {
-                        scorecard.push(pins.currBowlCount);
-                    }
-                }
-            
-                threeThrowAgo = twoThrowAgo;
-                twoThrowAgo = oneThrowAgo;
-                oneThrowAgo = [pins.currBowlCount, (scorecard.length - 1)]; //[count, index]
-                pins.currBowlCount = 0;
-                frameNum = Math.floor(scorecard.length / 2) + 1;
-                if (scorecard.length % 2 == 0)
-                    topFrame = true;
-                else
-                    topFrame = false;
-                if (topFrame || scorecard[18] == "X"){
-                    pins.reset()
-                }
-
-                //calculate score
-                //check for strike
-                if (scorecard[threeThrowAgo[1]] == "X")
-                    score += 10 + twoThrowAgo[0] + oneThrowAgo[0];
-                if (topFrame && frameNum < 12 && !extraFrame) {
-                    if ((oneThrowAgo[0] + twoThrowAgo[0] != 10) && oneThrowAgo[0] != 10) { // no spare and no strike
-                        score += oneThrowAgo[0] + twoThrowAgo[0];
-                    }
-                } else if (!topFrame) {
-                    //check for spare
-                    if (scorecard[twoThrowAgo[1]] == "/")
-                        score += 10 + oneThrowAgo[0];
-                }
-            }
-        } else if (gameOver) {
-            frameGUI.dispose();
-            scoreGUI.dispose();
-            speedGUI.dispose();
-            score2GUI.dispose();
-            
-            //end game gui
-            let resetBtn;
-        
-            gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
-            scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", "");
-            formatBtn(scoreGUI);
-            scoreGUI.textBlock.text = "Score: " + score;
-            scoreGUI.fontSize = 48;
-            scoreGUI.height = "15%";
-            scoreGUI.width = "40%";
-            gameGUI.addControl(scoreGUI);
-        
-            resetBtn = BABYLON.GUI.Button.CreateSimpleButton("reset", "Play Again?");
-            formatBtn(resetBtn);
-            resetBtn.top = "42%";
-            resetBtn.onPointerUpObservable.add(function() {
-                currScene = 0;
-            });
-            gameGUI.addControl(resetBtn);
-        }
-        
         //update GUI
         if (topFrame) {
             frameGUI.textBlock.text = "Top " + frameNum;
@@ -154,8 +45,38 @@ var addLogic = function() {
             frameGUI.textBlock.text = "Bot " + frameNum;
         }
         scoreGUI.textBlock.text = "Score: " + score;
-        //speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
+        speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
         lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
+
+        if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
+            gameOver = true;
+
+        if (!isSetup && !gameOver){
+            car.reset();
+            pins.setup();
+            isSetup = true;
+        }
+        
+
+        if (car.imposter.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
+            overRamp = true;
+            startTimer = new Date();
+        }
+        if (!overRamp) {
+            car.allowDriving();
+        } else if (!gameOver) { // wait till timer is done then count pins
+            cam.position = new BABYLON.Vector3(-45, 120, -20);
+            cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
+            endTimer = new Date();
+            if ((endTimer - startTimer) >= 15000) {
+                //Count pins knocked over after 15 secs
+                cleanupFrame();
+                manageFrames();
+                calculateScore();
+            }
+        } else if (gameOver) {
+            endGame();
+        }
     });
 };
 

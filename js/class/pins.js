@@ -5,19 +5,26 @@ class Pins{
             let pin = new Pin(gameScene, i);
             this.meshes.push(pin);
         }
-        this.isSetup = true;
+        this.standing = [true,true,true,true,true,true,true,true,true,true];
         this.currBowlCount = 10
+    }
+    
+    setup(){
+        for(var i = 0; i < 10; i++){
+            if(this.standing[i])
+                this.meshes[i].reset();
+        }
     }
 
     reset(){
         this.currBowlCount = 0;
         for(let pin of this.meshes)
-            pin.standing = true;
+            pin.reset();
     }
 
     countStanding(){
         for (let pin of this.meshes) {
-            if(pin.isStanding() == true)
+            if(pin.isStanding())
                 this.currBowlCount += 1;
         }
     }

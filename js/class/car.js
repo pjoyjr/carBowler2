@@ -2,7 +2,7 @@
 const CAR_MODEL_URL = "obj/model3.babylon";
 const CAR_PHYSICS = { mass: 10, restitution: 0.0 };
 const MAXSPEED = 12;
-const IMPOSTER_ALPHA = 1;
+const IMPOSTER_ALPHA = 0;
 
 var map = {};
 
@@ -36,14 +36,16 @@ class Car {
         this.accel = .2;
         this.decel = -.35;
         this.maxSpeed = MAXSPEED;
-        this.overRamp = false;
         this.addController(_gameScene);
     }
 
-    resetPosition(){
+    reset(){
         let randomStartPosition = Math.random() * 46 - 23;
         this.imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
         this.moved = false;
+        this.speed = 0;
+        cam.position = new BABYLON.Vector3(0, 40, -250);
+        cam.lockedTarget = this.imposter.getAbsolutePosition();
     }
 
     addController(gameScene){
@@ -60,28 +62,25 @@ class Car {
 
     allowDriving() {
        // console.log(this.imposter.getAbsolutePosition());
-        if(this.imposter.getAbsolutePosition().y > 16 && this.imposter.getAbsolutePosition().z < 25){
-            if (map["a"] || map["A"]) {
-                if (this.imposter.getAbsolutePosition().x > -28)
-                    this.imposter.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-            }else if (map["d"] || map["D"]) {
-                if (this.imposter.getAbsolutePosition().x < 28)
-                    this.imposter.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
-            }
+        if (map["a"] || map["A"]) {
+            if (this.imposter.getAbsolutePosition().x > -26)
+                this.imposter.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+        }else if (map["d"] || map["D"]) {
+            if (this.imposter.getAbsolutePosition().x < 26)
+                this.imposter.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+        }
 
-            if (map["w"] || map["W"]) {
-                this.moved = true;
-                this.speed += this.accel;
-                if (this.speed > MAXSPEED)
-                    this.speed = MAXSPEED;
-                if (this.speed < 0)
-                    this.speed = 0;
-                this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
-            } else if (((this.speed + this.decel) > 0) && this.moved) {
-                this.speed += this.decel;
-                this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
-            }
-        }else
-            this.overRamp = true;
+        if (map["w"] || map["W"]) {
+            this.moved = true;
+            this.speed += this.accel;
+            if (this.speed > MAXSPEED)
+                this.speed = MAXSPEED;
+            if (this.speed < 0)
+                this.speed = 0;
+            this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
+        } else if (((this.speed + this.decel) > 0) && this.moved) {
+            this.speed += this.decel;
+            this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
+        }
     }
 }
