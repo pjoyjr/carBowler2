@@ -5,48 +5,90 @@
 	y-axis refers to parallel to lane
 */
 var startTimer;
+var score = 0, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
+var gameOver = false, extraFrame = false;
+var topFrame = true, frameNum = 1;
+var isSetup = false;
+var scoreGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+var frameGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+var speedGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+var lastBowlGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
+var gameGUI;
+var overRamp = false;
 
-var addLogic = function() {
-    let score = 0, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
-    let gameOver = false, extraFrame = false;
-    var topFrame = true, frameNum = 1;
-    let environment = new Environment(gameScene)
-    let pins = new Pins(gameScene)
-    let car = new Car(gameScene);
-    let isSetup = false;
-    var scoreGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    var frameGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    var speedGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    var lastBowlGUI= BABYLON.GUI.Button.CreateSimpleButton("", "");
-    var gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
-    var overRamp = false;
+var guis = [scoreGUI, frameGUI, speedGUI, lastBowlGUI]
+var guisName = ["Frame:","Score:","Speed:","Last Bowl:"]
+var guisTop = ["-45%","-40%","-35%","-30%"]
 
-    let guis = [scoreGUI, frameGUI, speedGUI, lastBowlGUI]
-    let guisName = ["Frame:","Score:","Speed:","Last Bowl:"]
-    let guisTop = ["-45%","-40%","-35%","-30%"]
+var createGameGUI = function() {
+    gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
 
-    for(var i = 0; i < 4; i++){
-        guis[i] = BABYLON.GUI.Button.CreateSimpleButton("", "");
-        formatBtn(guis[i]);
-        guis[i].textBlock.text= guisName[i];
-        guis[i].top = guisTop[i];
-        guis[i].left = "40%";
-        guis[i].height = "5%";
-        guis[i].width = "20%";
-        guis[i].textBlock.fontSize = 24;
-        gameGUI.addControl(guis[i]);
+    scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("scoreGUI", "");
+    frameGUI = BABYLON.GUI.Button.CreateSimpleButton("frameGUI", "");
+    speedGUI = BABYLON.GUI.Button.CreateSimpleButton("speedGUI", "");
+    score2GUI = BABYLON.GUI.Button.CreateSimpleButton("score2GUI", "");
+
+    formatBtn(scoreGUI);
+    formatBtn(frameGUI);
+    formatBtn(speedGUI);
+    formatBtn(score2GUI);
+
+    frameGUI.textBlock.text = "Frame:";
+    frameGUI.top = "-45%";
+    frameGUI.left = "40%";
+    frameGUI.height = "5%";
+    frameGUI.width = "20%";
+    frameGUI.textBlock.fontSize = 24;
+
+    scoreGUI.textBlock.text = "Score:";
+    scoreGUI.top = "-40%";
+    scoreGUI.left = "40%";
+    scoreGUI.height = "5%";
+    scoreGUI.width = "20%";
+    scoreGUI.textBlock.fontSize = 24;
+
+    speedGUI.textBlock.text = "Speed:";
+    speedGUI.top = "-35%";
+    speedGUI.left = "40%";
+    speedGUI.height = "5%";
+    speedGUI.width = "20%";
+    speedGUI.textBlock.fontSize = 24;
+
+    score2GUI.textBlock.text = "Last Bowl:";
+    score2GUI.top = "-30%";
+    score2GUI.left = "40%";
+    score2GUI.height = "5%";
+    score2GUI.width = "20%";
+    score2GUI.textBlock.fontSize = 24;
+
+
+    gameGUI.addControl(frameGUI);
+    gameGUI.addControl(scoreGUI);
+    gameGUI.addControl(speedGUI);
+    gameGUI.addControl(score2GUI);
+};
+
+var updateGUI = function(car) {
+    if (topFrame) {
+        frameGUI.textBlock.text = "Top " + frameNum;
+    } else {
+        frameGUI.textBlock.text = "Bot " + frameNum;
     }
+    scoreGUI.textBlock.text = "Score: " + score;
+    speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
+    lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
+
+}
+var addLogic = function() {
+    var environment = new Environment(gameScene)
+    var pins = new Pins(gameScene)
+    var car = new Car(gameScene);
+    
+    createGameGUI();
 
     gameScene.registerAfterRender(function() {
         //update GUI
-        if (topFrame) {
-            frameGUI.textBlock.text = "Top " + frameNum;
-        } else {
-            frameGUI.textBlock.text = "Bot " + frameNum;
-        }
-        scoreGUI.textBlock.text = "Score: " + score;
-        speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
-        lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
+        updateGUI(car);
 
         if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
             gameOver = true;
