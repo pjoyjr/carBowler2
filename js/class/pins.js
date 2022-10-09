@@ -1,32 +1,49 @@
 class Pins{
     constructor(gameScene){
-        this.meshes = [];
+        this.meshes = this.createMeshes(gameScene);
+        this.isSetup = true;
+    }
+
+    cleanupPins() {
+        this.isSetup = false;
+        for(let mesh of this.meshes){
+            mesh.dispose();
+        }
+    };
+
+    //old
+    createMeshes(){
+        let meshes = [];
         for (var i = 0; i < 10; i = i + 1) {
             let pin = new Pin(gameScene, i);
-            this.meshes.push(pin);
+            meshes.push(pin);
         }
-        this.standing = [true,true,true,true,true,true,true,true,true,true];
-        this.currBowlCount = 10
-    }
-    
+        return meshes;
+    }    
+
     setup(){
-        for(var i = 0; i < 10; i++){
-            if(this.standing[i])
-                this.meshes[i].reset();
+        for(let pin of this.meshes){
+            if(pin.wasStanding)
+                pin.resetPosition();
+            else
+                pin.hide();
         }
     }
 
     reset(){
-        this.currBowlCount = 0;
-        for(let pin of this.meshes)
-            pin.reset();
-    }
-
-    countStanding(){
-        for (let pin of this.meshes) {
-            if(pin.isStanding())
-                this.currBowlCount += 1;
+        for(let pin of this.meshes){
+            pin.resetPosition();
         }
     }
 
+    countStanding(){
+        let currBowlCount = 0;
+        for (let pin of this.meshes) {
+            if(pin.isKnocked() && pin.wasStanding){
+                pin.wasStanding = false;
+                currBowlCount += 1;
+            }
+        }
+        return currBowlCount;
+    }
 }

@@ -5,7 +5,7 @@
 	y-axis refers to parallel to lane
 */
 var startTimer;
-var score = 0, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
+var score = 0, currBowlCount, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
 var gameOver = false, extraFrame = false;
 var topFrame = true, frameNum = 1;
 var isSetup = false;
@@ -79,6 +79,118 @@ var updateGUI = function(car) {
     lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
 }
 
+var cleanupFrame = function(pins, car) {
+    currBowlCount = pins.countStanding();
+    car.reset();
+    isSetup = false;
+    overRamp = false;
+};
+
+var manageFrames = function(pins) {
+    if (topFrame && currBowlCount == 10 && frameNum < 10) { //strike on top of frame
+        scorecard.push("-");
+        scorecard.push("X");
+    } else if (!topFrame && (currBowlCount + oneThrowAgo[0] == 10) && frameNum < 10) {
+        scorecard.push("/");
+    } else if (frameNum < 10) {
+        scorecard.push(currBowlCount);
+    } else if (scorecard.length == 18) { //top of 10th frame
+        if (currBowlCount == 10) {
+            extraFrame = true;
+            scorecard.push("X");
+        } else {
+            scorecard.push(currBowlCount);
+        }
+    } else if (scorecard.length == 19) { //bottom of 10th frame
+        if (currBowlCount == 10 && oneThrowAgo[0] == 10) {
+            scorecard.push("X");
+            extraFrame = true;
+        } else if ((currBowlCount + oneThrowAgo[0]) == 10) {
+            scorecard.push("/");
+            extraFrame = true;
+        } else {
+            scorecard.push(currBowlCount);
+        }
+    } else if (scorecard.length == 20) { //extra frame
+        if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && currBowlCount == 10) {
+            scorecard.push("X");
+            extraFrame = true;
+        } else if ((currBowlCount + oneThrowAgo[0]) == 10) {
+            scorecard.push("/");
+            extraFrame = true;
+        } else {
+            scorecard.push(currBowlCount);
+        }
+    }
+
+    threeThrowAgo = twoThrowAgo;
+    twoThrowAgo = oneThrowAgo;
+    oneThrowAgo = [currBowlCount, (scorecard.length - 1)]; //[count, index]
+    currBowlCount = 0;
+
+    frameNum = Math.floor(scorecard.length / 2) + 1;
+    if (scorecard.length % 2 == 0)
+        topFrame = true;
+    else
+        topFrame = false;
+    if (topFrame || scorecard[18] == "X")
+        //TODO: CHECK HERE!!!
+        pins.standing = [true, true, true, true, true, true, true, true, true, true];
+};
+
+var checkStrike = function() {
+    if (scorecard[threeThrowAgo[1]] == "X")
+        score += 10 + twoThrowAgo[0] + oneThrowAgo[0];
+};
+
+var checkSpare = function() {
+    if (scorecard[twoThrowAgo[1]] == "/")
+        score += 10 + oneThrowAgo[0];
+};
+
+var calculateScore = function() {
+    checkStrike();
+    if (topFrame && frameNum < 12 && !extraFrame) {
+        if ((oneThrowAgo[0] + twoThrowAgo[0] != 10) && oneThrowAgo[0] != 10) { // no spare and no strike
+            score += oneThrowAgo[0] + twoThrowAgo[0];
+        }
+    } else if (!topFrame) {
+        checkSpare();
+    }
+};
+
+var endGameGUI = function() {
+    var resetBtn;
+
+    gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
+
+    scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("sOUTLINE", "");
+    formatBtn(scoreGUI);
+
+    scoreGUI.textBlock.text = "Score: " + score;
+    scoreGUI.fontSize = 48;
+    scoreGUI.height = "15%";
+    scoreGUI.width = "40%";
+    gameGUI.addControl(scoreGUI);
+
+    resetBtn = BABYLON.GUI.Button.CreateSimpleButton("reset", "Play Again?");
+    formatBtn(resetBtn);
+    resetBtn.top = "42%";
+    resetBtn.onPointerUpObservable.add(function() {
+        currScene = 0;
+    });
+    gameGUI.addControl(resetBtn);
+};
+
+var endGame = function() {
+    //DISPLAY SCORE AND RETURN TO MAIN MENU AFTER CONFIRMING
+    frameGUI.dispose();
+    scoreGUI.dispose();
+    speedGUI.dispose();
+    score2GUI.dispose();
+    endGameGUI();
+};
+
 var addLogic = function() {
     var environment = new Environment(gameScene)
     var pins = new Pins(gameScene)
@@ -93,26 +205,27 @@ var addLogic = function() {
             gameOver = true;
 
         if (!isSetup && !gameOver){
+            console.log("SETTING UP PINS!")
             car.reset();
             pins.setup();
             isSetup = true;
         }
         
 
-        if (car.imposter.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
+        if ((car.imposter.getAbsolutePosition().z > 25 || car.imposter.getAbsolutePosition().y < 15) && !overRamp && isSetup) {
             overRamp = true;
             startTimer = new Date();
         }
         if (!overRamp) {
             car.allowDriving();
-        } else if (!gameOver) { // wait till timer is done then count pins
+        } else if (!gameOver && isSetup && overRamp) { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 15000) {
+            if ((endTimer - startTimer) >= 5000) {
                 //Count pins knocked over after 15 secs
-                cleanupFrame();
-                manageFrames();
+                cleanupFrame(pins, car);
+                manageFrames(pins);
                 calculateScore();
             }
         } else if (gameOver) {
