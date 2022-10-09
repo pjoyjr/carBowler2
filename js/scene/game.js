@@ -77,8 +77,8 @@ var updateGUI = function(car) {
     scoreGUI.textBlock.text = "Score: " + score;
     speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
     lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
-
 }
+
 var addLogic = function() {
     var environment = new Environment(gameScene)
     var pins = new Pins(gameScene)
@@ -87,7 +87,6 @@ var addLogic = function() {
     createGameGUI();
 
     gameScene.registerAfterRender(function() {
-        //update GUI
         updateGUI(car);
 
         if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
