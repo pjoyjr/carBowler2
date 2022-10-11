@@ -5,7 +5,6 @@
 	y-axis refers to parallel to lane
 */
 var startTimer;
-var score = 0, currBowlCount, oneThrowAgo = 0, twoThrowAgo = 0, threeThrowAgo = 0, scorecard = [];
 var gameOver = false, extraFrame = false;
 var topFrame = true, frameNum = 1;
 var isSetup = false;
@@ -19,6 +18,16 @@ var overRamp = false;
 var guis = [scoreGUI, frameGUI, speedGUI, lastBowlGUI]
 var guisName = ["Frame:","Score:","Speed:","Last Bowl:"]
 var guisTop = ["-45%","-40%","-35%","-30%"]
+
+
+var topFrame = true;
+var frameNum = 1;
+var scorecard = [];
+var score = 0;
+var oneThrowAgo = 0; //for spare/strike calculation
+var twoThrowAgo = 0; //for spare/strike calculation
+var threeThrowAgo = 0; //for spare/strike calculation
+var curRollCount = 0;
 
 var createGameGUI = function() {
     gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, gameScene);
@@ -75,12 +84,12 @@ var updateGUI = function(car) {
         frameGUI.textBlock.text = "Bot " + frameNum;
     }
     scoreGUI.textBlock.text = "Score: " + score;
-    speedGUI.textBlock.text = "Speed: " + car.speed.toFixed(2);
-    lastBowlGUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
+    speedGUI.textBlock.text = "Speed: " + speed.toFixed(2);
+    score2GUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
 }
 
 var cleanupFrame = function(pins, car) {
-    currBowlCount = pins.countStanding();
+    curRollCount = countStandingPins();
     gameScene.enablePhysics(forceVector, physicsPlugin);
     car.reset();
     isSetup = false;
@@ -88,46 +97,46 @@ var cleanupFrame = function(pins, car) {
 };
 
 var manageFrames = function(pins) {
-    if (topFrame && currBowlCount == 10 && frameNum < 10) { //strike on top of frame
+    if (topFrame && curRollCount == 10 && frameNum < 10) { //strike on top of frame
         scorecard.push("-");
         scorecard.push("X");
-    } else if (!topFrame && (currBowlCount + oneThrowAgo[0] == 10) && frameNum < 10) {
+    } else if (!topFrame && (curRollCount + oneThrowAgo[0] == 10) && frameNum < 10) {
         scorecard.push("/");
     } else if (frameNum < 10) {
-        scorecard.push(currBowlCount);
+        scorecard.push(curRollCount);
     } else if (scorecard.length == 18) { //top of 10th frame
-        if (currBowlCount == 10) {
+        if (curRollCount == 10) {
             extraFrame = true;
             scorecard.push("X");
         } else {
-            scorecard.push(currBowlCount);
+            scorecard.push(curRollCount);
         }
     } else if (scorecard.length == 19) { //bottom of 10th frame
-        if (currBowlCount == 10 && oneThrowAgo[0] == 10) {
+        if (curRollCount == 10 && oneThrowAgo[0] == 10) {
             scorecard.push("X");
             extraFrame = true;
-        } else if ((currBowlCount + oneThrowAgo[0]) == 10) {
+        } else if ((curRollCount + oneThrowAgo[0]) == 10) {
             scorecard.push("/");
             extraFrame = true;
         } else {
-            scorecard.push(currBowlCount);
+            scorecard.push(curRollCount);
         }
     } else if (scorecard.length == 20) { //extra frame
-        if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && currBowlCount == 10) {
+        if ((oneThrowAgo[0] == "X" || oneThrowAgo[0] == "/") && curRollCount == 10) {
             scorecard.push("X");
             extraFrame = true;
-        } else if ((currBowlCount + oneThrowAgo[0]) == 10) {
+        } else if ((curRollCount + oneThrowAgo[0]) == 10) {
             scorecard.push("/");
             extraFrame = true;
         } else {
-            scorecard.push(currBowlCount);
+            scorecard.push(curRollCount);
         }
     }
 
     threeThrowAgo = twoThrowAgo;
     twoThrowAgo = oneThrowAgo;
-    oneThrowAgo = [currBowlCount, (scorecard.length - 1)]; //[count, index]
-    currBowlCount = 0;
+    oneThrowAgo = [curRollCount, (scorecard.length - 1)]; //[count, index]
+    curRollCount = 0;
 
     frameNum = Math.floor(scorecard.length / 2) + 1;
     if (scorecard.length % 2 == 0)
@@ -136,7 +145,7 @@ var manageFrames = function(pins) {
         topFrame = false;
     if (topFrame || scorecard[18] == "X")
         //TODO: CHECK HERE!!!
-        pins.standing = [true, true, true, true, true, true, true, true, true, true];
+        pinStanding  = [true, true, true, true, true, true, true, true, true, true];
 };
 
 var checkStrike = function() {
@@ -159,6 +168,24 @@ var calculateScore = function() {
         checkSpare();
     }
 };
+
+var setupForThrow = function() {
+    addCar();
+    speed = 0;
+    cam.position = new BABYLON.Vector3(0, 40, -250);
+    cam.lockedTarget = carMesh.getAbsolutePosition();
+    setupPins(pinStanding);
+    isSetup = true;
+};
+
+
+
+var cleanupFrame = function() {
+    countStandingPins();
+    rmCar();
+    cleanupPins();
+};
+
 
 var endGameGUI = function() {
     var resetBtn;
@@ -192,45 +219,91 @@ var endGame = function() {
     endGameGUI();
 };
 
+var resetVariables = function() {
+    topFrame = true;
+    frameNum = 1;
+    scorecard = [];
+    score = 0;
+    oneThrowAgo = 0;
+    twoThrowAgo = 0;
+    threeThrowAgo = 0;
+    gameOver = false;
+    extraFrame = false;
+    isSetup = false;
+};
+
 var addLogic = function() {
-    var environment = new Environment(gameScene)
-    var pins = new Pins(gameScene)
-    var car = new Car(gameScene);
-    
-    createGameGUI();
+    addController();
+    resetVariables();
+
     gameScene.registerAfterRender(function() {
-        updateGUI(car);
+        if (!gameOver)
+            updateGUI();
 
         if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
             gameOver = true;
 
-        if (!isSetup && !gameOver){
-            car.reset();
-            pins.setup();
-            isSetup = true;
-        }
-        
+        if (!isSetup && !gameOver)
+            setupForThrow();
 
-        if ((car.imposter.getAbsolutePosition().z > 25 || car.imposter.getAbsolutePosition().y < 15) && !overRamp && isSetup) {
+        if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
             overRamp = true;
             startTimer = new Date();
         }
         if (!overRamp) {
-            car.allowDriving();
-        } else if (!gameOver && isSetup && overRamp) { // wait till timer is done then count pins
+            addCarMechanics();
+        } else if (!gameOver) { // wait till timer is done then count pins
             cam.position = new BABYLON.Vector3(-45, 120, -20);
-            cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
+            cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 5000) {
+            if ((endTimer - startTimer) >= 300) {
                 //Count pins knocked over after 15 secs
-                cleanupFrame(pins, car);
-                manageFrames(pins);
+                cleanupFrame();
+                manageFrames();
                 calculateScore();
             }
         } else if (gameOver) {
             endGame();
         }
     });
+    // var environment = new Environment(gameScene)
+    // var pins = new Pins(gameScene)
+    // var car = new Car(gameScene);
+    
+    // createGameGUI();
+    // gameScene.registerAfterRender(function() {
+    //     updateGUI(car);
+
+    //     if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
+    //         gameOver = true;
+
+    //     if (!isSetup && !gameOver){
+    //         car.reset(gameScene);
+    //         pins.setup(gameScene);
+    //         isSetup = true;
+    //     }
+        
+
+    //     if ((car.imposter.getAbsolutePosition().z > 25 || car.imposter.getAbsolutePosition().y < 15) && !overRamp && isSetup) {
+    //         overRamp = true;
+    //         startTimer = new Date();
+    //     }
+    //     if (!overRamp) {
+    //         car.allowDriving();
+    //     } else if (!gameOver && isSetup && overRamp) { // wait till timer is done then count pins
+    //         cam.position = new BABYLON.Vector3(-45, 120, -20);
+    //         cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
+    //         endTimer = new Date();
+    //         if ((endTimer - startTimer) >= 5000) {
+    //             //Count pins knocked over after 15 secs
+    //             cleanupFrame(pins, car);
+    //             manageFrames(pins);
+    //             calculateScore();
+    //         }
+    //     } else if (gameOver) {
+    //         endGame();
+    //     }
+    // });
 };
 
 
@@ -252,7 +325,9 @@ var createGameScene = function() {
     
     //CREATE PHYSICS ENGINE
     gameScene.enablePhysics(forceVector, physicsPlugin);
-    addLogic(gameScene);
+    createGameGUI();
+    addStationaryObjects();
+    addLogic();
     
     return gameScene;
 };

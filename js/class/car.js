@@ -1,109 +1,195 @@
-//const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
-const CAR_MODEL_URL = "obj/model3.babylon";
-const CAR_PHYSICS = { mass: 10, restitution: 0.0};
 
-const ACCEL = .2;
-const DECEL = -.35;
-const MAXSPEED = 12;
-const CAR_IMPOSTER_ALPHA = 0;
-const CAR_MESH_ALPHA = 1;
+//car variables
+var speed = 0;
+var accel = .2;
+var decel = -.35;
+var MAXSPEED = 12;
+var carMoved = false;
+const carPHYSICS = { mass: 10, restitution: 0.0};
 var map = {};
+var car, carMesh;
 
-class Car {
-    constructor(_gameScene) {
-        //create imposter
-        this.gameScene = _gameScene;
-        this.imposter = this.createImposter();
-        //create mesh
-        this.mesh = this.createMesh();
-        cam.position = new BABYLON.Vector3(0, 40, -250);
-        cam.lockedTarget = this.imposter.getAbsolutePosition();
+//Function to add car to scene
+var addCar = function() {
+    var carMeshMat;
+    var carMeshAlpha = 1;
+    var randomStartPosition = Math.random() * 46 - 23;
+
+    overRamp = false;
+    //create bounding box for physics engine
+    carMesh = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, gameScene);
+    carMesh.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+    carMeshMat = new BABYLON.StandardMaterial(gameScene);
+    carMeshMat.alpha = carMeshAlpha;
+    carMeshMat.diffuseColor = new BABYLON.Color3(0, 180, 0);
+    carMesh.material = carMeshMat;
+
+
+    //load in car from blender
+    BABYLON.SceneLoader.ImportMesh("Cube", "", "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon", gameScene,
+        function(newMeshes) {
+            car = newMeshes[0];
+            car.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
+            //car.position = new BABYLON.Vector3(0, 16, -180);
+            car.position = carMesh.getAbsolutePosition();
+        });
+
+    carMesh.physicsImpostor = new BABYLON.PhysicsImpostor(carMesh, BABYLON.PhysicsImpostor.SphereImpostor, carPHYSICS, gameScene);
+    carMoved = false;
+};
+
+//Function to remove car
+var rmCar = function() {
+    carMesh.dispose();
+    car.dispose(); //TODO ENABLE WITH BLENDERIMPORT
+};
+
+//Add action manager for input
+var addController = function() {
+    gameScene.actionManager = new BABYLON.ActionManager(gameScene);
+    gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
+        function(evt) {
+            map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+        }));
+    gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
+        function(evt) {
+            map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+        }));
+};
+
+var addCarMechanics = function() {
+    if (map["w"] || map["W"]) {
+        carMoved = true;
+        speed += accel;
+        if (speed > MAXSPEED)
+            speed = MAXSPEED;
+        if (speed < 0)
+            speed = 0;
+        var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition()); //impulse at center of mass;
+    } else if (((speed + decel) > 0) && carMoved) {
+        speed += decel;
+        var ImpulseVector = new BABYLON.Vector3(0, 0, speed);
+        carMesh.applyImpulse(ImpulseVector, carMesh.getAbsolutePosition());
+    }
+    if (map["a"] || map["A"]) {
+        if (carMesh.getAbsolutePosition().x > -32)
+            carMesh.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+    }
+
+    if (map["d"] || map["D"]) {
+        if (carMesh.getAbsolutePosition().x < 32)
+            carMesh.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+    }
+
+};
+
+
+// //const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
+// const CAR_MODEL_URL = "obj/model3.babylon";
+// const CAR_PHYSICS = { mass: 10, restitution: 0.0};
+
+// const ACCEL = .2;
+// const DECEL = -.35;
+// const MAXSPEED = 12;
+// const CAR_IMPOSTER_ALPHA = 0;
+// const CAR_MESH_ALPHA = 1;
+// var map = {};
+
+// class Car {
+//     constructor(_gameScene) {
+//         //create imposter
+//         this.imposter = this.createImposter(_gameScene);
+//         //create mesh
+//         this.mesh = this.createMesh(_gameScene);
+//         cam.position = new BABYLON.Vector3(0, 40, -250);
+//         cam.lockedTarget = this.imposter.getAbsolutePosition();
         
-        this.moved = false;
-        this.speed = 0;
-        this.accel = ACCEL;
-        this.decel = DECEL;
-        this.maxSpeed = MAXSPEED;
-        this.addController(_gameScene);
-    }
+//         this.moved = false;
+//         this.speed = 0;
+//         this.accel = ACCEL;
+//         this.decel = DECEL;
+//         this.maxSpeed = MAXSPEED;
+//         this.addController(_gameScene);
+//     }
 
-    createImposter(){
-        let imposter;
-        let randomStartPosition = Math.random() * 46 - 23;
-        let imposterMaterial = new BABYLON.StandardMaterial(this.gameScene);
-        imposterMaterial.alpha = CAR_IMPOSTER_ALPHA;
-        //imposterMaterial.diffuseColor = new BABYLON.Color3(0, 180, 0);
+//     createImposter(gameScene){
+//         let imposter;
+//         let randomStartPosition = Math.random() * 46 - 23;
+//         let imposterMaterial = new BABYLON.StandardMaterial(gameScene);
+//         imposterMaterial.alpha = CAR_IMPOSTER_ALPHA;
+//         //imposterMaterial.diffuseColor = new BABYLON.Color3(0, 180, 0);
 
-        imposter = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, this.gameScene);
-        imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-        var colors = imposter.getVerticesData(BABYLON.VertexBuffer.ColorKind);
-        if(!colors) {
-            colors = [];
-            var positions = imposter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-            for(var p = 0; p < positions.length / 3; p++) {
-                colors.push(Math.random(), Math.random(), Math.random(), 1);
-            }
-        }
-        imposter.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
-        imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.SphereImpostor, CAR_PHYSICS, this.gameScene);
+//         imposter = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, gameScene);
+//         imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+//         var colors = imposter.getVerticesData(BABYLON.VertexBuffer.ColorKind);
+//         if(!colors) {
+//             colors = [];
+//             var positions = imposter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+//             for(var p = 0; p < positions.length / 3; p++) {
+//                 colors.push(Math.random(), Math.random(), Math.random(), 1);
+//             }
+//         }
+//         imposter.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
+//         imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.SphereImpostor, CAR_PHYSICS, gameScene);
 
-        return imposter;
-    }
+//         return imposter;
+//     }
 
-    createMesh(){
-        let mesh;
-        let imposter = this.imposter
-        BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, this.gameScene,
-            function(newMeshes) {
-                mesh = newMeshes[0];
-                mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
-                mesh.position = imposter.getAbsolutePosition();});
-        return mesh;
-    }
+//     createMesh(gameScene){
+//         let mesh;
+//         let imposter = this.imposter
+//         BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, gameScene,
+//             function(newMeshes) {
+//                 mesh = newMeshes[0];
+//                 mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
+//                 mesh.position = imposter.getAbsolutePosition();});
+//         return mesh;
+//     }
 
-    reset(){
-        this.imposter.dispose();
-        let randomStartPosition = Math.random() * 46 - 23;
-        this.imposter = this.createImposter();
-        this.mesh = this.createMesh();
-        this.imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
-        this.moved = false;
-        this.speed = 0;
-        cam.position = new BABYLON.Vector3(0, 40, -250);
-        cam.lockedTarget = this.imposter.getAbsolutePosition();
-    }
+//     reset(gameScene){
+//         this.imposter.dispose();
+//         let randomStartPosition = Math.random() * 46 - 23;
+//         this.imposter = this.createImposter(gameScene);
+//         this.mesh = this.createMesh(gameScene);
+//         this.imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+//         this.moved = false;
+//         this.speed = 0;
+//         cam.position = new BABYLON.Vector3(0, 40, -250);
+//         cam.lockedTarget = this.imposter.getAbsolutePosition();
+//     }
 
-    addController(){
-        this.gameScene.actionManager = new BABYLON.ActionManager(this.gameScene);
-        this.gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
-            function(evt) {
-                map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-            }));
-        this.gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
-            function(evt) {
-                map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-            }));
-    }
+//     addController(){
+//         gameScene.actionManager = new BABYLON.ActionManager(gameScene);
+//         gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
+//             function(evt) {
+//                 map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+//             }));
+//         gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
+//             function(evt) {
+//                 map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+//             }));
+//     }
 
-    allowDriving() {
-        if (map["a"] || map["A"]) {
-            if (this.imposter.getAbsolutePosition().x > -26)
-                this.imposter.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
-        }else if (map["d"] || map["D"]) {
-            if (this.imposter.getAbsolutePosition().x < 26)
-                this.imposter.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
-        }
-        if (map["w"] || map["W"]) {
-            this.moved = true;
-            this.speed += this.accel;
-            if (this.speed > MAXSPEED)
-                this.speed = MAXSPEED;
-            if (this.speed < 0)
-                this.speed = 0;
-            this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
-        } else if (((this.speed + this.decel) > 0) && this.moved) {
-            this.speed += this.decel;
-            this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
-        }
-    }
-}
+//     allowDriving() {
+//         if (map["a"] || map["A"]) {
+//             if (this.imposter.getAbsolutePosition().x > -26)
+//                 this.imposter.translate(BABYLON.Axis.X, -1, BABYLON.Space.WORLD);
+//         }else if (map["d"] || map["D"]) {
+//             if (this.imposter.getAbsolutePosition().x < 26)
+//                 this.imposter.translate(BABYLON.Axis.X, 1, BABYLON.Space.WORLD);
+//         }
+//         if (map["w"] || map["W"]) {
+//             this.moved = true;
+//             this.speed += this.accel;
+//             if (this.speed > MAXSPEED)
+//                 this.speed = MAXSPEED;
+//             if (this.speed < 0)
+//                 this.speed = 0;
+//             this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
+//         } else if (((this.speed + this.decel) > 0) && this.moved) {
+//             this.speed += this.decel;
+//             this.imposter.applyImpulse(new BABYLON.Vector3(0, 0, this.speed), this.imposter.getAbsolutePosition()); //impulse at center of mass;
+//         }
+//     }
+// }
