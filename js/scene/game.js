@@ -81,6 +81,7 @@ var updateGUI = function(car) {
 
 var cleanupFrame = function(pins, car) {
     currBowlCount = pins.countStanding();
+    gameScene.enablePhysics(forceVector, physicsPlugin);
     car.reset();
     isSetup = false;
     overRamp = false;
@@ -197,7 +198,6 @@ var addLogic = function() {
     var car = new Car(gameScene);
     
     createGameGUI();
-
     gameScene.registerAfterRender(function() {
         updateGUI(car);
 
@@ -205,8 +205,6 @@ var addLogic = function() {
             gameOver = true;
 
         if (!isSetup && !gameOver){
-            car.imposter.dispose();
-            car.imposter = car.createImposter();
             car.reset();
             pins.setup();
             isSetup = true;
@@ -235,6 +233,10 @@ var addLogic = function() {
     });
 };
 
+
+var forceVector = new BABYLON.Vector3(0, -60, 0);
+var physicsPlugin = new BABYLON.CannonJSPlugin();
+
 var createGameScene = function() {
     gameScene = new BABYLON.Scene(engine);
 
@@ -249,8 +251,6 @@ var createGameScene = function() {
     light.intensity = .7;
     
     //CREATE PHYSICS ENGINE
-    var forceVector = new BABYLON.Vector3(0, -60, 0);
-    var physicsPlugin = new BABYLON.CannonJSPlugin();
     gameScene.enablePhysics(forceVector, physicsPlugin);
     addLogic(gameScene);
     
