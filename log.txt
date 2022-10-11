@@ -1,11 +1,12 @@
 BUGS:
-N/A
+Fix end game crashing.
 
 TODO:
 Fix car mechanics
+Make Classes
 
 POSSIBLE CHANGES:
-change 12 sec wait on pins failing to no movement from pins
+change wait time for pins failing
 
 
 FUTURE ADDONS:
