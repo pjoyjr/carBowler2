@@ -1,7 +1,6 @@
 
 var pinStanding = [true, true, true, true, true, true, true, true, true, true];
-var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10;
-var pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10;
+var pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10, pinB1, pinB2, pinB3, pinB4, pinB5, pinB6, pinB7, pinB8, pinB9, pinB10;
 var pinMesh, pinMeshAlpha = 0;
 
 //Function to add all pins for next bowl
@@ -10,7 +9,7 @@ var setupPins = function(pinsStanding) {
     pinMesh = new BABYLON.StandardMaterial(gameScene);
     pinMesh.alpha = pinMeshAlpha;
     var pinDIM = { height: 30, diameterTop: 5, diameterBottom: 9, tessellation: 12 };
-    var pinHeight = 50;
+    var pinHeight = 100;
 
     for (var i = 0; i < 10; i = i + 1) {
         if (pinsStanding[i]) {

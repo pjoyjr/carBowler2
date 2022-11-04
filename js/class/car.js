@@ -1,11 +1,11 @@
 
 //car variables
 var speed = 0;
-var accel = .2;
-var decel = -.35;
-var MAXSPEED = 12;
+var accel = .75/4;
+var decel = -.5/4;
+var MAXSPEED = 100;
 var carMoved = false;
-const carPHYSICS = { mass: 10, restitution: 0.0};
+const carPHYSICS = { mass: 200, restitution: 0.0};
 var map = {};
 var car, carMesh;
 

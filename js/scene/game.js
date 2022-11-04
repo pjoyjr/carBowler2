@@ -256,7 +256,7 @@ var addLogic = function() {
             cam.position = new BABYLON.Vector3(-45, 120, -20);
             cam.lockedTarget = islandMesh.getAbsolutePosition();
             endTimer = new Date();
-            if ((endTimer - startTimer) >= 300) {
+            if ((endTimer - startTimer) >= 10000) {
                 //Count pins knocked over after 15 secs
                 cleanupFrame();
                 manageFrames();
