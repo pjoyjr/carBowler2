@@ -4,6 +4,7 @@ var gameScene, cam, light;
 var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false });
 var activeScene = createMainMenuScene();
 var currScene = 0, state = 0;
+var game;
 engine.runRenderLoop(function() {
     activeScene.render();
     
@@ -17,7 +18,7 @@ engine.runRenderLoop(function() {
                 activeScene = createCarSelectScene();
                 break;
             case 2:
-                var game = new Game(engine);
+                game = new Game(engine);
                 activeScene = game.getScene();
                 break;
         }

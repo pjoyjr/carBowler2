@@ -1,26 +1,38 @@
+var score =0;
+oneThrowAgo = 0;
+
 class Game{
     constructor(_engine){
         this.engine = _engine;
         this.gameScene = new BABYLON.Scene(engine);
-        this.guis = [BABYLON.GUI.Button.CreateSimpleButton("", ""), BABYLON.GUI.Button.CreateSimpleButton("", ""), BABYLON.GUI.Button.CreateSimpleButton("", ""), BABYLON.GUI.Button.CreateSimpleButton("", "")]
+        this.frameGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
+        this.scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
+        this.speedGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
+        this.score2GUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
+        this.guis = [this.frameGUI, this.scoreGUI, this.speedGUI, this.score2GUI];
         this.topFrame = true;
-        
+        this.frameNum = 1;
+        this.car = null;
+        this.pins = null;
         this.setup();
 
-
         //addLogic functions
-        this.pins = new Pins(this.gameScene)
-        this.car = new Car(this.gameScene)
     }
 
     getScene(){
         return this.gameScene;
     }
 
-    createGUI(){
-        let guisName = ["frameGUI", "scoreGUI", "speedGUI", "score2GUI"]
-        let guisText = ["Frame:","Score:","Speed:","Last Bowl:"]
+    updateGUI(){
+        let guisText = ["", `Score: ${score}`, `Speed: ${speed.toFixed(2)}`,`Last Bowl: ${oneThrowAgo}`]
+        if (this.topFrame) {
+            guisText[0] = [`Top ${this.frameNum}`]
+        } else {
+            // this.guis[0].textBlock.text = ;
+            guisText[0] = [`Bot ${this.frameNum}`]
+        }
         let guisTop = ["-45%","-40%","-35%","-30%"]
+        let guisName = ["frameGUI", "scoreGUI", "speedGUI", "score2GUI"]
         var gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this.gameScene);
         for (let i = 0; i < this.guis.length; i++){
             this.guis[i] = BABYLON.GUI.Button.CreateSimpleButton(guisName[i], "");
@@ -36,18 +48,9 @@ class Game{
     }
 
     addLogic(){
-        this.gameScene.registerAfterRender(function() {
-            //Update GUI
-            if (this.topFrame) {
-                this.guis[0].textBlock.text = `Top ${this.frameNum}`;
-            } else {
-                this.guis[0].textBlock.text = `Bot ${this.frameNum}`;
-            }
-            this.guis[1].textBlock.text = `Score: ${score}`;
-            this.guis[2].textBlock.text = `Speed: ${speed.toFixed(2)}`;
-            this.guis[3].textBlock.text = `Last Bowl: ${oneThrowAgo}`;
-        });
+        
 
+        //try 1
         // if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
         //     gameOver = true;
 
@@ -124,8 +127,13 @@ class Game{
         light.intensity = .7;
         this.gameScene.enablePhysics(forceVector, physicsPlugin);
         
-        this.createGUI();
-        let environment = new Environment(this.gameScene);
-        //this.addLogic();
+        this.updateGUI();
+        let environment = new Environment(this.gameScene);        
+        this.car = new Car(this.gameScene);
+        this.pins = new Pins(this.gameScene);
+        this.gameScene.registerAfterRender(function() {
+            //Update GUI
+            
+        });
     }
 }
