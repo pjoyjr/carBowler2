@@ -19,19 +19,6 @@ var twoThrowAgo = 0; //for spare/strike calculation
 var threeThrowAgo = 0; //for spare/strike calculation
 var curRollCount = 0;
 
-var pins, car;
-
-var updateGUI = function() {
-    if (topFrame) {
-        frameGUI.textBlock.text = "Top " + frameNum;
-    } else {
-        frameGUI.textBlock.text = "Bot " + frameNum;
-    }
-    scoreGUI.textBlock.text = "Score: " + score;
-    speedGUI.textBlock.text = "Speed: " + speed.toFixed(2);
-    score2GUI.textBlock.text = "Last Bowl: " + oneThrowAgo;
-}
-
 var cleanupFrame = function() {
     curRollCount = countStandingPins();
     //gameScene.enablePhysics(forceVector, physicsPlugin);
@@ -170,77 +157,4 @@ var resetVariables = function() {
     gameOver = false;
     extraFrame = false;
     pins.isSetup = false;
-};
-
-var addLogic = function() {
-    // addController();
-    // resetVariables();
-
-    // gameScene.registerAfterRender(function() {
-    //     if (!gameOver)
-    //         updateGUI();
-
-    //     if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
-    //         gameOver = true;
-
-    //     if (!isSetup && !gameOver)
-    //         setupForThrow();
-
-    //     if (carMesh.getAbsolutePosition().z > 25 && !overRamp && isSetup) {
-    //         overRamp = true;
-    //         startTimer = new Date();
-    //     }
-    //     if (!overRamp) {
-    //         addCarMechanics();
-    //     } else if (!gameOver) { // wait till timer is done then count pins
-    //         cam.position = new BABYLON.Vector3(-45, 120, -20);
-    //         cam.lockedTarget = islandMesh.getAbsolutePosition();
-    //         endTimer = new Date();
-    //         if ((endTimer - startTimer) >= 10000) {
-    //             //Count pins knocked over after 15 secs
-    //             cleanupFrame();
-    //             manageFrames();
-    //             calculateScore();
-    //         }
-    //     } else if (gameOver) {
-    //         endGame();
-    //     }
-    // });
-    var environment = new Environment(gameScene)
-    pins = new Pins(gameScene)
-    car = new Car(gameScene);
-    
-    createGameGUI();
-    gameScene.registerAfterRender(function() {
-        updateGUI();
-
-        if ((scorecard.length == 20 && !extraFrame) || (scorecard.length == 21 && extraFrame))
-            gameOver = true;
-
-        if (!pins.isSetup && !gameOver){
-            car.reset();
-            pins.setup();
-        }
-        
-
-        if ((car.imposter.getAbsolutePosition().z > 25 || car.imposter.getAbsolutePosition().y < 15) && !overRamp && pins.isSetup) {
-            overRamp = true;
-            startTimer = new Date();
-        }
-        if (!overRamp) {
-            car.allowDriving();
-        } else if (!gameOver && overRamp) { // wait till timer is done then count pins
-            cam.position = new BABYLON.Vector3(-45, 120, -20);
-            cam.lockedTarget = environment.islandMesh.getAbsolutePosition();
-            endTimer = new Date();
-            if ((endTimer - startTimer) >= 15000) {
-                //Count pins knocked over after 15 secs
-                cleanupFrame();
-                manageFrames();
-                calculateScore();
-            }
-        } else if (gameOver) {
-            endGame();
-        }
-    });
 };
