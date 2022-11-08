@@ -1,26 +1,3 @@
-
-//car variables
-var speed = 0;
-var accel = .75/4;
-var decel = -.5/4;
-//var MAXSPEED = 100;
-var carMoved = false;
-const carPHYSICS = { mass: 200, restitution: 0.0};
-var map = {};
-var car, carMesh;
-//const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
-const CAR_MODEL_URL = "obj/model3.babylon";
-const CAR_PHYSICS = { mass: 10, restitution: 0.0};
-
-const ACCEL = .2;
-const DECEL = -.35;
-const MAXSPEED = 6;
-const CAR_IMPOSTER_ALPHA = 0;
-const CAR_MESH_ALPHA = 1;
-var map = {};
-
-var carImposter;
-
 class Car {
     constructor(gameScene) {
         this.gameScene = gameScene;
@@ -31,16 +8,20 @@ class Car {
         cam.position = new BABYLON.Vector3(0, 40, -250);
         cam.lockedTarget = this.imposter.getAbsolutePosition();
         
+        this.overRamp = false;
         this.moved = false;
         this.speed = 0;
         this.accel = ACCEL;
         this.decel = DECEL;
         this.maxSpeed = MAXSPEED;
-        this.addController();
+    }
+
+    checkRampStatus(){
+        return (this.imposter.getAbsolutePosition().z > 25 || this.imposter.getAbsolutePosition().y < 15) && !this.overRamp
     }
 
     createImposter(){
-        carImposter;
+        let carImposter;
         let randomStartPosition = Math.random() * 46 - 23;
         let imposterMaterial = new BABYLON.StandardMaterial(this.gameScene);
         imposterMaterial.alpha = CAR_IMPOSTER_ALPHA;
@@ -83,18 +64,6 @@ class Car {
         this.speed = 0;
         cam.position = new BABYLON.Vector3(0, 40, -250);
         cam.lockedTarget = this.imposter.getAbsolutePosition();
-    }
-
-    addController(){
-        this.gameScene.actionManager = new BABYLON.ActionManager(this.gameScene);
-        this.gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger,
-            function(evt) {
-                map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-            }));
-        this.gameScene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger,
-            function(evt) {
-                map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-            }));
     }
 
     allowDriving() {

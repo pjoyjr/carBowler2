@@ -4,28 +4,10 @@
 	z-axis refers to normal to lane
 	y-axis refers to parallel to lane
 */
-var startTimer;
-var gameOver = false, extraFrame = false;
-var topFrame = true, frameNum = 1;
-// var pins.isSetup = false;
-var overRamp = false;
+// var isSetup = false; pins
+// var overRamp = false; cars
 
-var topFrame = true;
-var frameNum = 1;
-var scorecard = [];
-var score = 0;
-var oneThrowAgo = 0; //for spare/strike calculation
-var twoThrowAgo = 0; //for spare/strike calculation
-var threeThrowAgo = 0; //for spare/strike calculation
-var curRollCount = 0;
 
-var cleanupFrame = function() {
-    curRollCount = countStandingPins();
-    //gameScene.enablePhysics(forceVector, physicsPlugin);
-    car.reset();
-    pins.isSetup = false;
-    overRamp = false;
-};
 
 var manageFrames = function(pins) {
     if (topFrame && curRollCount == 10 && frameNum < 10) { //strike on top of frame
@@ -112,7 +94,6 @@ var cleanupFrame = function() {
     pins.countStanding();
     car.reset();
 };
-
 
 var endGameGUI = function() {
     var resetBtn;

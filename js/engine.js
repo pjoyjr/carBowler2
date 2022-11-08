@@ -1,13 +1,12 @@
 
 const canvas = document.getElementById("renderCanvas");
-var gameScene, cam, light;
+var cam, light;
 var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false });
 var activeScene = createMainMenuScene();
 var currScene = 0, state = 0;
 var game;
 engine.runRenderLoop(function() {
     activeScene.render();
-    
     if (state != currScene) {
         state = currScene;
         switch (currScene) {
