@@ -17,7 +17,8 @@ engine.runRenderLoop(function() {
                 activeScene = createCarSelectScene();
                 break;
             case 2:
-                activeScene = createGameScene();
+                var game = new Game(engine);
+                activeScene = game.getScene();
                 break;
         }
     }
