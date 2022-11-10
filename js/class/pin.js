@@ -10,30 +10,7 @@ class Pin{
     constructor(gameScene, index){
         this.gameScene = gameScene
         this.index = index;
-        this.imposter = this.createImposter();
-        this.mesh = this.createMesh();
-        this.wasStanding = true;
-    }
 
-    dispose(){
-        this.imposter.dispose();
-        //this.mesh.dispose();
-    }
-    
-    createMesh(){
-        let mesh;
-        let imposter = this.imposter;
-        BABYLON.SceneLoader.ImportMesh("Pin", "", PIN_URL, this.gameScene,
-            function(newMeshes) {
-                mesh = newMeshes[0];
-                mesh.scaling = PIN_SCALING;
-                mesh.parent = imposter;
-            }
-        );
-        return mesh;
-    }
-
-    createImposter(){
         let imposter = new BABYLON.MeshBuilder.CreateCylinder(`imposter${this.index}`, PIN_DIM, this.gameScene);
         switch (this.index) {
             case 0:
@@ -68,15 +45,34 @@ class Pin{
                 break;
         }
         imposter.material = new BABYLON.StandardMaterial(this.gameScene);
-        imposter.isVisible = false;
-        imposter.physicsImpostor = new BABYLON.PhysicsImpostor(imposter, BABYLON.PhysicsImpostor.CylinderImpostor, PIN_PHYSICS, this.gameScene);
-        return imposter;
+        imposter.isVisible = false;this.imposter = imposter;
+        
+        let mesh;
+        BABYLON.SceneLoader.ImportMesh("Pin", "", PIN_URL, this.gameScene,
+            function(newMeshes) {
+                mesh = newMeshes[0];
+                mesh.scaling = PIN_SCALING;
+                mesh.parent = imposter;
+            }
+        );
+        this.mesh = mesh;
+        this.wasStanding = true;
+    }
+
+    enablePhysic(){
+        this.imposter.physicsImpostor = new BABYLON.PhysicsImpostor(this.imposter, BABYLON.PhysicsImpostor.CylinderImpostor, PIN_PHYSICS, this.gameScene);
+    }
+
+
+    dispose(){
+        this.imposter.dispose();
+        //this.mesh.dispose();
     }
 
     reset(){
         this.dispose();
-        this.imposter = this.createImposter(this.gameScene);
-        this.mesh = this.createMesh(this.gameScene);
+        // this.imposter = this.createImposter(this.gameScene);
+        // this.mesh = this.createMesh(this.gameScene);
     }
 
     hide(){

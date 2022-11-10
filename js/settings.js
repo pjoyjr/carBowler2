@@ -18,7 +18,7 @@ var map = {};
 //Car Driving
 const ACCEL = .2;
 const DECEL = -.35;
-const MAXSPEED = 6;
+const MAXSPEED = 12;
 
 //Models
 //const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
