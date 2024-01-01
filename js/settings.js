@@ -22,7 +22,7 @@ const MAXSPEED = 12;
 
 //Models
 //const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
-const CAR_MODEL_URL = "obj/model3.babylon";
+const CAR_MODEL_URL = "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon";
 //const PLANKS_TEXTURE_URL = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/planks.jpg", gameScene);
-const PLANKS_TEXTURE_URL = "texture/planks.jpg" 
+const PLANKS_TEXTURE_URL = "/texture/planks.jpg" 
 
