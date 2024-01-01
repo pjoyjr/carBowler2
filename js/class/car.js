@@ -2,7 +2,24 @@ class Car {
     constructor(gameScene) {
         this.gameScene = gameScene;
         //create imposter
+        this.imposter = this.createImposter();
         
+        //create mesh
+        let mesh;
+        BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, this.gameScene,
+            function(newMeshes) {
+                mesh = newMeshes[0];
+                mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
+                mesh.position = imposter.getAbsolutePosition();});
+        this.mesh = mesh;
+        this.moved = false;
+        this.speed = 0;
+        this.accel = ACCEL;
+        this.decel = DECEL;
+        this.maxSpeed = MAXSPEED;
+    }
+
+    createImposter(){
         let imposter;
         let randomStartPosition = Math.random() * 46 - 23;
         let imposterMaterial = new BABYLON.StandardMaterial(this.gameScene);
@@ -10,7 +27,7 @@ class Car {
         //imposterMaterial.diffuseColor = new BABYLON.Color3(0, 180, 0);
 
         imposter = BABYLON.MeshBuilder.CreateSphere("carMesh", { diameter: 12.0 }, this.gameScene);
-        imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+        imposter.position = new BABYLON.Vector3(randomStartPosition, 22, -180);
         var colors = imposter.getVerticesData(BABYLON.VertexBuffer.ColorKind);
         if(!colors) {
             colors = [];
@@ -20,32 +37,18 @@ class Car {
             }
         }
         imposter.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
-        this.imposter = imposter;
-        //create mesh
-        let mesh;
-        BABYLON.SceneLoader.ImportMesh("Cube", "", CAR_MODEL_URL, this.gameScene,
-            function(newMeshes) {
-                mesh = newMeshes[0];
-                mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
-                mesh.position = imposter.getAbsolutePosition();});
-        this.mesh = mesh;
-        cam.position = new BABYLON.Vector3(0, 40, -250);
-        cam.lockedTarget = this.imposter.getAbsolutePosition();
-        
-        this.overRamp = false;
-        this.moved = false;
-        this.speed = 0;
-        this.accel = ACCEL;
-        this.decel = DECEL;
-        this.maxSpeed = MAXSPEED;
+        return imposter;
     }
 
     getMeshAbsolutePosition(){
-        this.imposter.getAbsolutePosition();
+        return this.imposter.getAbsolutePosition();
     }
 
-    checkRampStatus(){
-        return (this.imposter.getAbsolutePosition().z > 25 || this.imposter.getAbsolutePosition().y < 15) && !this.overRamp
+    overRampStatus(){
+        if (this.imposter.getAbsolutePosition().z > 25 || this.imposter.getAbsolutePosition().y < 15){
+            return true;
+        }
+        return false;
     }
 
     enablePhysics(){
@@ -57,11 +60,9 @@ class Car {
         let randomStartPosition = Math.random() * 46 - 23;
         this.imposter = this.createImposter(this.gameScene);
         this.mesh = this.createMesh(this.gameScene);
-        this.imposter.position = new BABYLON.Vector3(randomStartPosition, 18, -180);
+        this.imposter.position = new BABYLON.Vector3(randomStartPosition, 22, -180);
         this.moved = false;
         this.speed = 0;
-        cam.position = new BABYLON.Vector3(0, 40, -250);
-        cam.lockedTarget = this.imposter.getAbsolutePosition();
     }
 
     allowDriving() {

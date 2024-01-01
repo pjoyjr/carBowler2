@@ -21,7 +21,7 @@ class Environment{
         var planksTexture = new BABYLON.Texture(PLANKS_TEXTURE_URL, this.gameScene);
 
         // Skybox
-        var skybox = BABYLON.Mesh.CreateBox("skyBox", 2560, this.gameScene);
+        var skybox = BABYLON.Mesh.CreateBox("skyBox", 1600, this.gameScene);
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.gameScene);
         skyboxMaterial.backFaceCulling = false;
         skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/TropicalSunnyDay", this.gameScene);
@@ -35,12 +35,12 @@ class Environment{
         var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.gameScene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/ground.jpg", this.gameScene);
         groundMaterial.diffuseTexture.uScale = groundMaterial.diffuseTexture.vScale = 4;
-        this.ground = BABYLON.Mesh.CreateGround("ground", 2560, 2560, 32, this.gameScene, false);
+        this.ground = BABYLON.Mesh.CreateGround("ground", 1600, 1600, 32, this.gameScene, false);
         this.ground.position.y = -1;
         this.ground.material = groundMaterial;
 
         // Water
-        var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 2560, 2560, 32, this.gameScene, false);
+        var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 1600, 1600, 32, this.gameScene, false);
         var water = new BABYLON.WaterMaterial("water", this.gameScene);
         water.bumpTexture = new BABYLON.Texture("https://raw.githubusercontent.com/pjoyjr/carBowler2/main/texture/waterbump.png", this.gameScene);
         water.windForce = -45;

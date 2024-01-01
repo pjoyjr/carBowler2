@@ -8,6 +8,7 @@ class Game{
         this.score2GUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
         this.gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this.scene);
         this.guis = [this.frameGUI, this.scoreGUI, this.speedGUI, this.score2GUI];
+        this.cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -300), this.scene);
 
         this.extraFrame = false;
         this.topFrame = true;
@@ -19,19 +20,22 @@ class Game{
         this.threeThrowAgo = 0;
         this.curRollCount = 0;
         this.gameOver = false;
+        this.counting = false;
 
         this.startTimer = null;
         this.endTimer = null;
         this.startTimer = null;
         this.environment = new Environment(this.scene);
         this.car = new Car(this.scene);
+        this.cam.lockedTarget = this.car.getMeshAbsolutePosition();
         this.pins = new Pins(this.scene);
+        
         this.setup();
         this.environment.enablePhysics();
         this.car.enablePhysics();
         this.pins.enablePhysics();
         this.scene.registerAfterRender(
-            () => this.addLogic()
+            () => this.main()
         );
     }
 
@@ -121,10 +125,13 @@ class Game{
             this.topFrame = true;
         else
             this.topFrame = false;
-        if(this.topFrame || this.scorecard[18] == "X")
+        if(this.topFrame || this.scorecard[18] == "X"){
+            console.log(this.scorecard);
             return
             //TODO: CHECK HERE!!!
             //pinStanding  = [true, true, true, true, true, true, true, true, true, true];
+        }
+
     }
 
     checkStrike(){
@@ -180,51 +187,50 @@ class Game{
         endGameGUI();
     }
 
-    addLogic(){
-        this.addController();
-        this.updateGUI();
+    countPinsAndReset = () => {
+        this.curRollCount = this.pins.countStanding();
+        
+        this.manageFrames(); // this is where the scorecard is updated TODO: make this a function from game.js
+        this.calculateScore(); // this is where the score is calculated TODO: make this a function from game.js
         if((this.scorecard.length == 20 && !this.extraFrame) || (this.scorecard.length == 21 && this.extraFrame))
-            this.gameOver = true;
-        if(!this.pins.isSetup && !this.gameOver){
-            //this.car.reset();
-            this.speed = 0;
-            cam.position = new BABYLON.Vector3(0, 40, -250);
-            cam.lockedTarget = this.car.getMeshAbsolutePosition();
-            //this.pins.setup();
-        }
-        if(this.car.checkRampStatus() && this.pins.isSetup) {
-            this.car.overRamp = true;
-            this.startTimer = new Date();
-        }
-        if(!this.car.overRamp) {
-            this.car.allowDriving();
-        }else 
-        if(!this.gameOver && this.car.overRamp) { // wait till timer is done then count pins
-            cam.position = new BABYLON.Vector3(-45, 120, -20);
-            cam.lockedTarget = this.environment.islandMesh.getAbsolutePosition();
-            this.endTimer = new Date();
-            if((this.endTimer - this.startTimer) >= 5) {//x * 1000 = x seconds
-                this.curRollCount = this.pins.countStanding();
-                this.scene.enablePhysics(forceVector, physicsPlugin);
-                //this.car.reset();
-                this.pins.isSetup = false;
-                this.car.overRamp = false;
-
-                //manageFrames
-                this.manageFrames(); // this is where the scorecard is updated TODO: make this a function from game.js
-                this.calculateScore(); // this is where the score is calculated TODO: make this a function from game.js
-            }
-        }else if(this.gameOver) {
-            this.endGame();
+        this.endGame();
+        else{
+            delete this.car;
+            this.car = new Car(this.scene);
+            this.car.enablePhysics();
+            this.pins.reset();
+            this.scene.enablePhysics(forceVector, physicsPlugin);
         }
     }
 
+    main(){
+        this.addController();
+
+        if(this.pins.isSetup) {
+            if(!this.car.overRampStatus()) {
+                this.car.allowDriving();
+                this.cam.position = this.car.getMeshAbsolutePosition().add(new BABYLON.Vector3(0, 50, -250));
+                this.cam.lockedTarget = this.car.getMeshAbsolutePosition();
+            }else{
+                this.cam.position = new BABYLON.Vector3(0, 160, -50);
+                this.cam.lockedTarget = this.car.getMeshAbsolutePosition();
+                //sleep for 5 seconds
+                if (!this.counting) {
+                    setTimeout(this.countPinsAndReset, 7000);
+                    this.counting = true;
+                }
+            }
+        }else{
+            this.pins.setup();
+        }
+        this.updateGUI();
+    }
+
     setup(){
-        cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -200), this.scene); //top view
         //cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(-125, 50, -125), gameScene); //left view
         //cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 50, -250), gameScene); //behind view
         //cam = new BABYLON.ArcRotateCamera("cam", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), gameScene); //ARCROTATE Camera
-        cam.attachControl(canvas, true);
+        this.cam.attachControl(canvas, true);
         light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 50, 0), this.scene);
         light.intensity = .7;
         this.scene.enablePhysics(forceVector, physicsPlugin);

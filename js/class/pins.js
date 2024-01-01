@@ -43,6 +43,7 @@ class Pins{
     }
         
     countStanding(){
+        console.log("counting standing");
         let currBowlCount = 0;
         for (let pin of this.meshes) {
             if(pin.isKnocked() && pin.wasStanding){
@@ -50,6 +51,7 @@ class Pins{
                 currBowlCount += 1;
             }
         }
+        console.log(`pins standing: ${currBowlCount}`)
         return currBowlCount;
     }
 };
