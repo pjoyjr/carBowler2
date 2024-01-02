@@ -1,5 +1,22 @@
+ENVIRONMENT_ALPHAS = 1;
+
 class Environment {
     constructor(gameScene) {
+        this.water = null;
+        this.waterMesh = null;
+        this.ground = null;
+        this.laneMesh = null;
+        this.rampMesh = null;
+        this.island = null;
+        this.islandMesh = null;
+        this.skybox = null;
+
+        this.skyboxMaterial = null;
+        this.groundMaterial = null;
+        this.laneMeshMaterial = null;
+        this.waterMaterial = null;
+        this.islandMaterial = null;
+
         this.initStationaryObjects(gameScene).catch(error => {
             console.error('Error initializing stationary objects:', error);
         });
@@ -11,9 +28,9 @@ class Environment {
                 this.createSkybox(gameScene),
                 this.createGround(gameScene),
                 this.createWater(gameScene),
-                this.createLane(gameScene),
                 this.createRamp(gameScene),
-                this.createIsland(gameScene)
+                this.createIsland(gameScene),
+                this.createLane(gameScene)
             ]);
         } catch (error) {
             // Handle or throw the error
@@ -23,34 +40,34 @@ class Environment {
     }
 
     async createSkybox(gameScene) {
-        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, gameScene);
-        var skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMaterial", gameScene);
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/textures/TropicalSunnyDay", gameScene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;
-        skybox.infiniteDistance = true;
+        this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, gameScene);
+        this.skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMaterial", gameScene);
+        this.skyboxMaterial.backFaceCulling = false;
+        this.skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/textures/TropicalSunnyDay", gameScene);
+        this.skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        this.skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial.disableLighting = true;
+        this.skybox.material = this.skyboxMaterial;
+        this.skybox.infiniteDistance = true;
     }
 
     async createGround(gameScene) {
-        var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", gameScene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/ground.jpg", gameScene);
-        groundMaterial.diffuseTexture.uScale = 6;
-        groundMaterial.diffuseTexture.vScale = 6;
+        this.groundMaterial = new BABYLON.StandardMaterial("groundMaterial", gameScene);
+        this.groundMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/ground.jpg", gameScene);
+        this.groundMaterial.diffuseTexture.uScale = 6;
+        this.groundMaterial.diffuseTexture.vScale = 6;
 
         this.ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, gameScene);
-        this.ground.material = groundMaterial;
+        this.ground.material = this.groundMaterial;
     }
 
     async createWater(gameScene) {
-        var waterMesh = BABYLON.MeshBuilder.CreateGround("waterMesh", { width: 1000, height: 1000 }, gameScene);
-        var water = new BABYLON.WaterMaterial("water", gameScene, new BABYLON.Vector2(512, 512));
-        water.bumpTexture = new BABYLON.Texture("assets/textures/waterbump.png", gameScene);
-        water.addToRenderList(this.ground);
-        waterMesh.material = water;
+        this.waterMesh = BABYLON.MeshBuilder.CreateGround("waterMesh", { width: 1000, height: 1000 }, gameScene);
+        this.water = new BABYLON.WaterMaterial("water", gameScene, new BABYLON.Vector2(512, 512));
+        this.water.bumpTexture = new BABYLON.Texture("assets/textures/waterbump.png", gameScene);
+        this.water.addToRenderList(this.ground);
+        this.waterMesh.material = this.water;
     }
 
     async createLane(gameScene) {
@@ -70,34 +87,38 @@ class Environment {
     createLaneCollisionMesh(gameScene) {
         this.laneMesh = BABYLON.MeshBuilder.CreateBox("laneCollisionMesh", { height: 10, width: 56, depth: 230 }, gameScene);
         this.laneMesh.position = new BABYLON.Vector3(0, 3, -100);
-        this.laneMesh.isVisible = true;
+        this.laneMesh.isVisible = ENVIRONMENT_ALPHAS;
     }
 
     createRampCollisionMesh(gameScene) {
         this.rampMesh = BABYLON.MeshBuilder.CreateBox("rampCollisionMesh", { height: 10, width: 56, depth: 70 }, gameScene);
         this.rampMesh.position = new BABYLON.Vector3(0, 7.5, -11);
         this.rampMesh.rotation.x = 31 * Math.PI / 40;
-        this.rampMesh.isVisible = true;
+        this.rampMesh.isVisible = ENVIRONMENT_ALPHAS;
     }
 
     createIslandCollisionMesh(gameScene) {
         this.islandMesh = BABYLON.MeshBuilder.CreateBox("islandCollisionMesh", { height: 22, width: 70, depth: 70 }, gameScene);
         this.islandMesh.position = new BABYLON.Vector3(0, 25, 170);
-        this.islandMesh.isVisible = true;
+        this.islandMesh.isVisible = ENVIRONMENT_ALPHAS;
     }
 
     createIslandMesh(gameScene) {
-        var island = BABYLON.MeshBuilder.CreateBox("island", { height: 14, width: 70, depth: 70 }, gameScene);
-        island.position = new BABYLON.Vector3(0, 25, 170);
-        var islandMaterial = new BABYLON.StandardMaterial("islandMaterial", gameScene);
-        islandMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/planks.jpg", gameScene);
-        island.material = islandMaterial;
+        this.island = BABYLON.MeshBuilder.CreateBox("island", { height: 14, width: 70, depth: 70 }, gameScene);
+        this.island.position = new BABYLON.Vector3(0, 25, 170);
+        this.islandMaterial = new BABYLON.StandardMaterial("islandMaterial", gameScene);
+        this.islandMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/planks.jpg", gameScene);
+        this.islandMaterial.alpha = 1;
+        this.island.material = this.islandMaterial;
+        this.island.isVisible = ENVIRONMENT_ALPHAS;
     }
 
     importLaneMesh(gameScene) {
         BABYLON.SceneLoader.ImportMesh("", "", "assets/models/lane.babylon", gameScene, (newMeshes) => {
             this.laneMesh = newMeshes[0];
-            this.laneMesh.position = new BABYLON.Vector3(0, 5.75, -105);
+            this.laneMesh.position = new BABYLON.Vector3(0, 3, -100);
+            this.laneMesh.scaling = new BABYLON.Vector3(30, 8, 120);
+            this.laneMesh.isVisible = ENVIRONMENT_ALPHAS;
         });
     }
 
