@@ -1,5 +1,5 @@
 class GameController {
-    constructor(scene) {
+    constructor(scene, car) {
         // Bowling game specific properties
         this.extraFrame = false;
         this.topFrame = true;
@@ -15,14 +15,9 @@ class GameController {
 
         // Game entities
         this.scene = scene;
-        this.environment = new Environment(scene);
-        this.car = new Car(scene, "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon");
-        // this.pins = new Pins(scene);
-    }
-
-    setup() {
-        this.addController();
-        this.setupPhysics();
+        this.environment = new Environment(this.scene);
+        this.car = car;
+        // this.pins = new Pins(this.scene);
     }
 
     addController() {
@@ -38,9 +33,9 @@ class GameController {
 
     setupPhysics() {
         // Enable physics for game objects
-        this.scene.enablePhysics(forceVector, physicsPlugin);
-        this.environment.enablePhysics();
-        this.car.enablePhysics();
+        // this.scene.enablePhysics(forceVector, physicsPlugin);
+        // this.environment.enablePhysics();
+        // this.car.enablePhysics();
         // this.pins.enablePhysics();
     }
 
@@ -128,6 +123,7 @@ class GameController {
             this.checkSpare();
         }
     }
+
     endGameGUI() {
         // Display end-of-game GUI elements
         var resetBtn;
@@ -165,22 +161,22 @@ class GameController {
         // Count standing pins, manage frames, and reset game state
         // this.curRollCount = this.pins.countStanding();
 
-        this.manageFrames();
+        // this.manageFrames();
         this.calculateScore();
-        if ((this.scorecard.length == 20 && !this.extraFrame) || (this.scorecard.length == 21 && this.extraFrame))
-            this.endGame();
-        else {
-            delete this.car;
-            this.car = new Car(this.scene, "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon");
-            this.car.enablePhysics();
-            // this.pins.reset();
-        }
+        // if ((this.scorecard.length == 20 && !this.extraFrame) || (this.scorecard.length == 21 && this.extraFrame))
+        //     this.endGame();
+        // else {
+        //     delete this.car;
+        //     this.car = new Car(this.scene, "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon");
+        //     this.car.enablePhysics();
+        //     this.pins.reset();
+        // }
     }
 
     main() {
         // Main game loop
         this.addController();
-
+        this.car.allowDriving();
         // if (this.pins.isSetup) {
         //     if (!this.car.overRampStatus()) {
         //         this.car.allowDriving();
@@ -196,10 +192,10 @@ class GameController {
         //     }
         // } else {
         //     this.pins.setup();
-        // }
+    }
 
         // this.updateGUI();
-    }
+        // }
 
     // Additional methods (endGame, countPinsAndReset, etc.) from your Game class
 }

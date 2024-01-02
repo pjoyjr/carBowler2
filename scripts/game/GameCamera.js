@@ -3,6 +3,7 @@ class GameCamera {
         this.scene = scene;
         this.target = target; // Usually the car or player entity
         this.camera = null;
+        this.setup();
     }
 
     setup() {
@@ -11,8 +12,9 @@ class GameCamera {
         // Additional camera setup...
     }
 
-    updatePosition() {
+    updatePosition(newPosition) {
         // Logic to update the camera's position based on game state
+        this.camera.position = newPosition;
     }
 
     // Additional camera related methods...
