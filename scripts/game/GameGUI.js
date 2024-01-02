@@ -7,12 +7,12 @@ class GameGUI {
 
     setup() {
         // Setup GUI elements...
-        this.initializeGUI();
+        // this.initializeGUI();
     }
 
     update() {
         // Update GUI elements...
-        this.gameController.updateGUI();
+        // this.gameController.updateGUI();
     }
 
     // Additional GUI related methods...

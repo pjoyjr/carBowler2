@@ -16,10 +16,14 @@ class Car {
         try {
             this.imposter = this.createImposter();
             const importedMeshes = await this.loadCarMesh();
-            this.mesh = importedMeshes[0];
-            this.mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
-            this.mesh.position = this.imposter.getAbsolutePosition();
-            // this.enablePhysics();
+            if (importedMeshes.length > 0) {
+                this.mesh = importedMeshes[0];
+                this.mesh.scaling = new BABYLON.Vector3(5.96, 5.96, 5.96);
+                this.mesh.position = this.imposter.getAbsolutePosition();
+                // this.enablePhysics(); // Uncomment if physics should be enabled here
+            } else {
+                throw new Error(`No meshes were imported. Tried to load in meshes for: ${this.carModelURL}`);
+            }
         } catch (error) {
             console.error('Error creating car:', error);
         }
@@ -27,7 +31,7 @@ class Car {
 
     async loadCarMesh() {
         return new Promise((resolve, reject) => {
-            BABYLON.SceneLoader.ImportMesh("Car", "obj/", this.carModelURL, this.gameScene,
+            BABYLON.SceneLoader.ImportMesh("Car", "", this.carModelURL, this.gameScene,
                 (importedMeshes) => {
                     resolve(importedMeshes);
                 },

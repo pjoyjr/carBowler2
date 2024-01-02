@@ -16,8 +16,8 @@ class GameController {
         // Game entities
         this.scene = scene;
         this.environment = new Environment(scene);
-        this.car = new Car(scene, "../assets/models/model3.babylon");
-        this.pins = new Pins(scene);
+        this.car = new Car(scene, "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon");
+        // this.pins = new Pins(scene);
     }
 
     setup() {
@@ -41,7 +41,7 @@ class GameController {
         this.scene.enablePhysics(forceVector, physicsPlugin);
         this.environment.enablePhysics();
         this.car.enablePhysics();
-        this.pins.enablePhysics();
+        // this.pins.enablePhysics();
     }
 
     manageFrames() {
@@ -163,7 +163,7 @@ class GameController {
 
     countPinsAndReset = () => {
         // Count standing pins, manage frames, and reset game state
-        this.curRollCount = this.pins.countStanding();
+        // this.curRollCount = this.pins.countStanding();
 
         this.manageFrames();
         this.calculateScore();
@@ -171,9 +171,9 @@ class GameController {
             this.endGame();
         else {
             delete this.car;
-            this.car = new Car(this.scene, "../assets/models/model3.babylon");
+            this.car = new Car(this.scene, "https://raw.githubusercontent.com/pjoyjr/carBowler2/main/obj/model3.babylon");
             this.car.enablePhysics();
-            this.pins.reset();
+            // this.pins.reset();
         }
     }
 
@@ -181,24 +181,24 @@ class GameController {
         // Main game loop
         this.addController();
 
-        if (this.pins.isSetup) {
-            if (!this.car.overRampStatus()) {
-                this.car.allowDriving();
-                this.cam.position = this.car.position.add(new BABYLON.Vector3(0, 50, -250));
-                this.cam.lockedTarget = this.car.position;
-            } else {
-                this.cam.position = new BABYLON.Vector3(0, 160, -50);
-                this.cam.lockedTarget = this.car.position;
-                if (!this.counting) {
-                    setTimeout(this.countPinsAndReset.bind(this), 7000);
-                    this.counting = true;
-                }
-            }
-        } else {
-            this.pins.setup();
-        }
+        // if (this.pins.isSetup) {
+        //     if (!this.car.overRampStatus()) {
+        //         this.car.allowDriving();
+        //         this.cam.position = this.car.position.add(new BABYLON.Vector3(0, 50, -250));
+        //         this.cam.lockedTarget = this.car.position;
+        //     } else {
+        //         this.cam.position = new BABYLON.Vector3(0, 160, -50);
+        //         this.cam.lockedTarget = this.car.position;
+        //         if (!this.counting) {
+        //             setTimeout(this.countPinsAndReset.bind(this), 7000);
+        //             this.counting = true;
+        //         }
+        //     }
+        // } else {
+        //     this.pins.setup();
+        // }
 
-        this.updateGUI();
+        // this.updateGUI();
     }
 
     // Additional methods (endGame, countPinsAndReset, etc.) from your Game class
