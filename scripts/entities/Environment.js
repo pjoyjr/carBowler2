@@ -31,7 +31,7 @@ class Environment {
         var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, this.gameScene);
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMaterial", this.gameScene);
         skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", this.gameScene);
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/textures/TropicalSunnyDay", this.gameScene);
         skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
         skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -43,7 +43,7 @@ class Environment {
     createGround() {
         // Code for creating the ground
         var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.gameScene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("textures/ground.jpg", this.gameScene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/ground.jpg", this.gameScene);
         groundMaterial.diffuseTexture.uScale = 6;
         groundMaterial.diffuseTexture.vScale = 6;
         
@@ -55,7 +55,7 @@ class Environment {
         // Code for creating the water
         var waterMesh = BABYLON.MeshBuilder.CreateGround("waterMesh", { width: 1000, height: 1000 }, this.gameScene);
         var water = new BABYLON.WaterMaterial("water", this.gameScene, new BABYLON.Vector2(512, 512));
-        water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", this.gameScene);
+        water.bumpTexture = new BABYLON.Texture("assets/textures/waterbump.png", this.gameScene);
         water.addToRenderList(this.ground);
         waterMesh.material = water;
     }
@@ -76,7 +76,7 @@ class Environment {
 
     importLaneMesh() {
         // Code for importing the lane mesh from Blender
-        BABYLON.SceneLoader.ImportMesh("", "obj/", "lane.babylon", this.gameScene, (newMeshes) => {
+        BABYLON.SceneLoader.ImportMesh("", "assets/models/", "lane.babylon", this.gameScene, (newMeshes) => {
             this.laneMesh = newMeshes[0];
             this.laneMesh.position = new BABYLON.Vector3(0, 0, -5); // Adjust position as needed
             // Note: You might want to set the material for the laneMesh here if needed
@@ -95,7 +95,7 @@ class Environment {
         var island = BABYLON.MeshBuilder.CreateBox("island", { width: 4, depth: 4, height: 0.5 }, this.gameScene);
         island.position = new BABYLON.Vector3(0, 0.25, 10); // Positioned at the end of the lane
         var islandMaterial = new BABYLON.StandardMaterial("islandMaterial", this.gameScene);
-        islandMaterial.diffuseTexture = new BABYLON.Texture("textures/planks.jpg", this.gameScene);
+        islandMaterial.diffuseTexture = new BABYLON.Texture("assets/textures/planks.jpg", this.gameScene);
         island.material = islandMaterial;
     }
 }

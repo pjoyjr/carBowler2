@@ -1,5 +1,5 @@
-class Game {
-    constructor(engine) {
+class GameController {
+    constructor(scene) {
         // Bowling game specific properties
         this.extraFrame = false;
         this.topFrame = true;
@@ -13,84 +13,35 @@ class Game {
         this.gameOver = false;
         this.counting = false;
 
-        this.engine = engine;
-        this.scene = new BABYLON.Scene(engine);
-        this.setupGUI();
-        // Setting up the environment and game objects
-        this.environment = new Environment(this.scene);
-        this.car = new Car(this.scene, "model3.babylon");
-        this.pins = new Pins(this.scene);
-        // this.setupPhysics();
-        this.cam = this.setupCamera();
-
-        // Main game loop
-        this.scene.registerAfterRender(
-            () => this.main()
-        );
+        // Game entities
+        this.scene = scene;
+        this.environment = new Environment(scene);
+        this.car = new Car(scene, "../assets/models/model3.babylon");
+        this.pins = new Pins(scene);
     }
 
-    getScene() {
-        // Return the created scene
-        return this.scene;
-    }
-
-    setupGUI() {
-        // Initialize GUI elements
-        this.frameGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
-        this.scoreGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
-        this.speedGUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
-        this.score2GUI = BABYLON.GUI.Button.CreateSimpleButton("", "");
-        this.gameGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this.scene);
-        this.guis = [this.frameGUI, this.scoreGUI, this.speedGUI, this.score2GUI];
-    }
-
-    setupCamera() {
-        // Initialize camera
-        let cam = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, 45, -300), this.scene);
-        cam.lockedTarget = this.car.position;
-        return cam;
-    }
-
-    setupPhysics() {
-        // Enable physics for game objects
-        this.environment.enablePhysics();
-        this.car.enablePhysics();
-        this.pins.enablePhysics();
-        this.scene.enablePhysics(forceVector, physicsPlugin);
-    }
-
-    updateGUI() {
-        // Update GUI elements
-        let guisText = ["", `Score: ${this.score}`, `Speed: ${this.car.speed}`, `Last Bowl: ${this.oneThrowAgo}`];
-        if (this.topFrame) {
-            guisText[0] = [`Top ${this.frameNum}`];
-        } else {
-            guisText[0] = [`Bot ${this.frameNum}`];
-        }
-        let guisTop = ["-45%", "-40%", "-35%", "-30%"];
-        let guisName = ["frameGUI", "scoreGUI", "speedGUI", "score2GUI"];
-        for (let i = 0; i < this.guis.length; i++) {
-            this.guis[i] = BABYLON.GUI.Button.CreateSimpleButton(guisName[i], "");
-            formatBtn(this.guis[i]);
-            this.guis[i].textBlock.text = guisText[i];
-            this.guis[i].top = guisTop[i];
-            this.guis[i].left = "40%";
-            this.guis[i].height = "5%";
-            this.guis[i].width = "20%";
-            this.guis[i].fontSize = 24;
-            this.gameGUI.addControl(this.guis[i]);
-        }
+    setup() {
+        this.addController();
+        this.setupPhysics();
     }
 
     addController() {
         // Register keyboard input handlers
         this.scene.actionManager = new BABYLON.ActionManager(this.scene);
-        this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
-            map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+        this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, (evt) => {
+            map[evt.sourceEvent.key] = evt.sourceEvent.type === "keydown";
         }));
-        this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
-            map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+        this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, (evt) => {
+            map[evt.sourceEvent.key] = evt.sourceEvent.type === "keydown";
         }));
+    }
+
+    setupPhysics() {
+        // Enable physics for game objects
+        this.scene.enablePhysics(forceVector, physicsPlugin);
+        this.environment.enablePhysics();
+        this.car.enablePhysics();
+        this.pins.enablePhysics();
     }
 
     manageFrames() {
@@ -177,7 +128,6 @@ class Game {
             this.checkSpare();
         }
     }
-
     endGameGUI() {
         // Display end-of-game GUI elements
         var resetBtn;
@@ -221,10 +171,9 @@ class Game {
             this.endGame();
         else {
             delete this.car;
-            this.car = new Car(this.scene, "model3.babylon");
+            this.car = new Car(this.scene, "../assets/models/model3.babylon");
             this.car.enablePhysics();
             this.pins.reset();
-            this.scene.enablePhysics(forceVector, physicsPlugin);
         }
     }
 
@@ -252,11 +201,5 @@ class Game {
         this.updateGUI();
     }
 
-    setup() {
-        // Initialize the game's initial setup, cameras, and physics
-        this.cam.attachControl(canvas, true);
-        light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 50, 0), this.scene);
-        light.intensity = 0.7;
-        this.scene.enablePhysics(forceVector, physicsPlugin);
-    }
+    // Additional methods (endGame, countPinsAndReset, etc.) from your Game class
 }
